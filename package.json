@@ -1,0 +1,43 @@
+{
+  "name": "react-redux-firebase-starter",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": "^14.18.0"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.34",
+    "@fortawesome/free-brands-svg-icons": "^5.15.3",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@reduxjs/toolkit": "^1.5.1",
+    "bootstrap": "^4.6.0",
+    "firebase": "^8.3.3",
+    "firebase-encode": "^0.0.5",
+    "history": "^4.10.1",
+    "react": "^17.0.0",
+    "react-avatar": "^3.10.0",
+    "react-dom": "^17.0.0",
+    "react-firebaseui": "^5.0.2",
+    "react-helmet": "^6.1.0",
+    "react-hook-form": "^7.0.5",
+    "react-redux": "^7.2.3",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^4.0.3",
+    "reactstrap": "^8.9.0",
+    "redux": "^4.0.5"
+  },
+  "scripts": {
+    "dev": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "deploy": "yarn build && firebase deploy"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

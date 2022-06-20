@@ -1,0 +1,24 @@
+{
+    "recommendations": [
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "aaron-bond.better-comments",
+        "mikestead.dotenv",
+        "github.copilot",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "ecmel.vscode-html-css",
+        "abusaidm.html-snippets",
+        "oderwat.indent-rainbow",
+        "visualstudioexptteam.vscodeintellicode",
+        "orta.vscode-jest",
+        "zainchen.json",
+        "christian-kohler.path-intellisense",
+        "esbenp.prettier-vscode",
+        "burkeholland.simple-react-snippets",
+        "formulahendry.terminal",
+        "shardulm94.trailing-spaces",
+        "rangav.vscode-thunder-client",
+        "github.classroom"
+    ]
+}
