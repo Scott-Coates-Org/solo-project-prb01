@@ -43,10 +43,7 @@ Update your progress by checking off the tasks for each sprint. We will **not** 
 
 ## Mockups
 
-[*Replace me with mockups*]
 
-| ![Homepage mockup](mockups/PXL_20220620_195042607.jpg) | ![Homepage mockup](mockups/PXL_20220620_195042607.jpg) |
+| ![Homepage mockup](mockups/PXL_20220620_195042607.jpg) | ![LoggedIn view](mockups/PXL_20220620_195104895.jpg) |
 |----------------------------------------------------------------------|----------------------------------------------------------------------|
-| ![LoggedIn view](mockups/PXL_20220620_195104895.jpg) | ![LoggedIn view](mockups/PXL_20220620_195104895.jpg) |
-|----------------------------------------------------------------------|----------------------------------------------------------------------|
-| ![Collections](mockups/PXL_20220620_195113114.MP.jpg) | ![Collections](mockups/PXL_20220620_195113114.MP.jpg) |
+| ![Collections](mockups/PXL_20220620_195113114.MP.jpg) |
