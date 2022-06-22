@@ -1,10 +1,8 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=8037725&assignment_repo_type=AssignmentRepo)
 # Spotify Playlist Combiner
 
-<!---
-*** WHEN YOU ARE UP AND RUNNING, DELETE EVERYTHING ABOVE ME EXCEPT THE VERY TOP LINE. ***
-*** RENAME THE TOP LINE WITH YOUR PROJECT NAME. ***
--->
+## Description
+Have you ever wanted to be able to add songs to customize a public playlist in Spotify? Of course you can just clone a public playlist, but what happens if they update it? Are you going to check those playlists every day just to make sure your playlists are in synch? Well, fret no more because the solution is here: SpoLiBi - your friendly Spotify Playlist Combiner with automatic synch.
 
 ## Sprint Progress
 
@@ -13,7 +11,7 @@ Update your progress by checking off the tasks for each sprint. We will **not** 
 ### Sprint 1
 
 - [x] Get app approved (DM Scott for approval)
-- [ ] Create mockups (physical paper, low-fi)
+- [x] Create mockups (physical paper, low-fi)
 - [ ] Define scope (DM Scott for approval)
   - [ ] Define milestones for each sprint
   - [ ] Define final deliverable for v1
@@ -21,31 +19,34 @@ Update your progress by checking off the tasks for each sprint. We will **not** 
   - [ ] Be publicly accessible
   - [ ] Have working authentication
   - [ ] Have technical component 5% done
+- [ ] Spotify Authentication
 
 ### Sprint 2
 
 - [ ] Technical component 25%
 - [ ] Re-evaluate milestones and features
-- [ ] [*Fill me in with Sprint 2 milestones*]
-- [ ] [*Fill me in with Sprint 2 milestones*]
+- [ ] Setup database, Design & Create collections
+- [ ] Create reducer to add playlists to database
 
 ### Sprint 3
 
 - [ ] Technical component 50%
 - [ ] Re-evaluate milestones and features
-- [ ] [*Fill me in with Sprint 3 milestones*]
+- [ ] Create functions to perform necessary Spotify actions with API (CRUD)
 - [ ] [*Fill me in with Sprint 3 milestones*]
 
 ### Sprint 4
 
 - [ ] Technical component 100%
-- [ ] [*Fill me in with Sprint 4 milestones*]
-- [ ] [*Fill me in with Sprint 4 milestones*]
+- [ ] User authentication
+- [ ] Layout & Styling
 
 ## Mockups
 
 [*Replace me with mockups*]
 
-| ![Benjamin Bannekat](https://octodex.github.com/images/bannekat.png) | ![Benjamin Bannekat](https://octodex.github.com/images/bannekat.png) |
+| ![Homepage mockup](mockups/PXL_20220620_195042607.jpg) | ![Homepage mockup](mockups/PXL_20220620_195042607.jpg) |
 |----------------------------------------------------------------------|----------------------------------------------------------------------|
-| ![Benjamin Bannekat](https://octodex.github.com/images/bannekat.png) | ![Benjamin Bannekat](https://octodex.github.com/images/bannekat.png) |
+| ![LoggedIn view](mockups/PXL_20220620_195104895.jpg) | ![LoggedIn view](mockups/PXL_20220620_195104895.jpg) |
+|----------------------------------------------------------------------|----------------------------------------------------------------------|
+| ![Collections](mockups/PXL_20220620_195113114.MP.jpg) | ![Collections](mockups/PXL_20220620_195113114.MP.jpg) |
