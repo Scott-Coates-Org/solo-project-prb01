@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import Home from "components/home";
+import Home from "components/Home";
+import "../../public/assets/styles";
 import { AuthProvider, useAuth } from "components/user/Auth";
 import Login from "components/user/Login";
 import Logout from "components/user/Logout";
