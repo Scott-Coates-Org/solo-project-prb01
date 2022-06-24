@@ -25,7 +25,7 @@ Update your progress by checking off the tasks for each sprint. We will **not** 
   - [x] Be publicly accessible
   - [x] Have working authentication
   - [x] Have technical component 5% done
-- [ ] Spotify Authentication
+- [x] Spotify Authentication
 
 ### Sprint 2
 
