@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { createSpotifyAuth } from "redux/user";
+import { createSpotifyAuth } from "redux/spotify";
 
 const Dashboard = (props) => {
   const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
@@ -14,7 +14,7 @@ const Dashboard = (props) => {
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const dispatch = useDispatch();
-  const { data, isLoaded, hasErrors } = useSelector((state) => state.user);
+  const { data, isLoaded, hasErrors } = useSelector((state) => state.spotify);
   const [me, setMe] = useState();
   const [playlists, setPlaylists] = useState();
 
