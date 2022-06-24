@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { createSpotifyAuth } from "redux/user";
-const { randomBytes } = require("crypto");
 
 const Dashboard = (props) => {
   const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
