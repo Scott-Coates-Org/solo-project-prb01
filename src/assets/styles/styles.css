@@ -14,9 +14,9 @@
   font-size: 5rem;
   font-size: clamp(5rem, 3.4rem + 8vw, 13rem);
   text-shadow: 
-  0 0 2px var(--primary), 
-  0 0 2px var(--primary), 
-  0 0 2px var(--primary), 
-  0 0 2px var(--primary), 
-  0px 0px 20px var(--accent);
+  -1px -1px 5px var(--primary), 
+  -1px 1px 5px var(--primary), 
+  1px -1px 5px var(--primary), 
+  1px 1px 5px var(--primary),
+    0px 0px 100px var(--primary);
 }
