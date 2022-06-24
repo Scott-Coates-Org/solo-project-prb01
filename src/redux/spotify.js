@@ -33,7 +33,7 @@ export const reducer = spotify.reducer;
 export const { getData, getDataSuccess, getDataFailure, appendData } = spotify.actions;
 
 export const createSpotifyAuth = createAsyncThunk(
-  "user/createSpotifyAuth",
+  "spotify/createSpotifyAuth",
   async (payload, thunkAPI) => {
     try {
       thunkAPI.dispatch(appendData(payload));
