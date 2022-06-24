@@ -1,9 +1,10 @@
-import { useAuth } from './auth';
+import { useAuth } from './Auth';
 import { Form, FormGroup, Row, Col, Input, Label, Button } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { useEffect, useState } from 'react';
 import { StyledFirebaseAuth } from 'react-firebaseui';
+import { useNavigate, useLocation } from "react-router-dom";
 
 const componentLoginFroms = {
   'login': LoginForm,
@@ -12,17 +13,16 @@ const componentLoginFroms = {
 
 export default function Login(props) {
   const { user } = useAuth();
-
   const [form, setForm] = useState('login');
-
+  const navigate = useNavigate()
   const Component = componentLoginFroms[form];
 
   // if user exists, redirect to home
   useEffect(() => {
     if (user) {
-      const returnTo = props.location.state?.appState?.returnTo || '/';
+      const returnTo = props.history?.location?.pathname || '/';
 
-      props.history.replace(returnTo);
+      navigate(returnTo);
     }
   }, [user, props.history]);
 

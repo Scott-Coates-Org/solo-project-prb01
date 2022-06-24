@@ -13,7 +13,7 @@ import {
 } from 'reactstrap';
 import React from "react";
 import { Helmet } from "react-helmet";
-import { useAuth } from './user/auth';
+import { useAuth } from './user/Auth';
 
 export default function Layout(props) {
   const { user } = useAuth();
