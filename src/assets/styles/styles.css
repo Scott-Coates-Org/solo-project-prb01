@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap');
+
+.homepage-bg {
+  background-image: url('../img/homepage-bg.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.logo-large {
+  font-family: 'Leckerli One', cursive;
+  width: max-content;
+  height: max-content;
+  font-size: 5rem;
+  font-size: clamp(5rem, 3.4rem + 8vw, 13rem);
+  text-shadow: 
+  0 0 2px var(--primary), 
+  0 0 2px var(--primary), 
+  0 0 2px var(--primary), 
+  0 0 2px var(--primary), 
+  0px 0px 20px var(--accent);
+}
