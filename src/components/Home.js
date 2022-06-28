@@ -1,6 +1,6 @@
 const Home = (props) => {
   return (
-    <div className="vh-100 vw-100 d-flex justify-content-center align-items-center homepage-bg">
+    <div className="vh-100 vw-100 d-flex justify-content-center align-items-center homepage-bg p-2">
       <div className="d-flex flex-column text-center justify-content-center">
         <div className="position-relative">
           <p className="text-text logo-large text-shadow mb-n4 mb-xl-n5">
