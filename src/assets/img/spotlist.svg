@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="51.302296mm"
+   height="41.155727mm"
+   viewBox="0 0 51.302296 41.155727"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="spotlist.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-left="0.2"
+     fit-margin-top="0.2"
+     fit-margin-right="0.2"
+     fit-margin-bottom="0.2"
+     inkscape:zoom="0.73673541"
+     inkscape:cx="244.32109"
+     inkscape:cy="267.39586"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
+     inkscape:window-x="0"
+     inkscape:window-y="35"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient28096">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop28092" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop28094" />
+    </linearGradient>
+    <rect
+       x="-333.72186"
+       y="134.29732"
+       width="208.45569"
+       height="238.94525"
+       id="rect12068" />
+    <rect
+       x="-333.72186"
+       y="134.29732"
+       width="208.45569"
+       height="238.94525"
+       id="rect12068-3" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient28096"
+       id="linearGradient28098"
+       x1="-328.92267"
+       y1="233.71182"
+       x2="-231.96266"
+       y2="233.71182"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(78.902264,-77.815718)">
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,8.8576881,36.092163)"
+       id="text12066"
+       style="font-size:192px;line-height:1.25;font-family:'Leckerli One';-inkscape-font-specification:'Leckerli One';white-space:pre;shape-inside:url(#rect12068);fill:#ffffff;fill-opacity:1;stroke:#20242b;stroke-width:4.0252;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="-333.72266"
+         y="305.61583"
+         id="tspan28550">S</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,25.979785,36.51449)"
+       id="text12066-6"
+       style="font-size:192px;line-height:1.25;font-family:'Leckerli One';-inkscape-font-specification:'Leckerli One';white-space:pre;shape-inside:url(#rect12068-3);fill:#4abdac;fill-opacity:1;stroke:#20242b;stroke-width:4.0252;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="-333.72266"
+         y="305.61583"
+         id="tspan28552">L</tspan></text>
+  </g>
+</svg>
