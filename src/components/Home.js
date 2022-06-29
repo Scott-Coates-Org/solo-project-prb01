@@ -20,7 +20,7 @@ const Home = (props) => {
         <div className="mt-4">
           <div className="mb-2">
             <a
-              href="#"
+              href="/dashboard"
               role="button"
               className="opacity-0 btn-lg btn-accent text-primary text-decoration-none blur-in font-weight-bold p-2 px-5"
             >
@@ -29,7 +29,7 @@ const Home = (props) => {
           </div>
           <div className="d-sm-none mt-4">
             <a
-              href="#"
+              href="/dashboard"
               role="button"
               className="opacity-0 btn-lg btn-text text-primary text-decoration-none blur-in font-weight-bold p-2 px-5"
             >
@@ -39,7 +39,7 @@ const Home = (props) => {
 
           <p className="text-text d-none d-sm-block opacity-0 blur-in">
             or{" "}
-            <a href="#" className="text-text">
+            <a href="/dashboard" className="text-text">
               <u>login</u>
             </a>
           </p>
