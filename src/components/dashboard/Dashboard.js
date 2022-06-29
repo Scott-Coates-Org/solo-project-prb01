@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { createSpotifyAuth } from "redux/spotify";
+import Nav from "components/nav/Nav";
 
 const Dashboard = (props) => {
   const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
@@ -127,6 +128,7 @@ const Dashboard = (props) => {
 
   return (
     <div className="vh-100 vw-100 d-flex justify-content-center align-items-center homepage-bg p-2">
+      <Nav />
       <div>
         <button onClick={handleSpotifyLogin}>Spotify Auth</button>
         <button onClick={handleSetAccessToken}>Spotify Set Access Token</button>

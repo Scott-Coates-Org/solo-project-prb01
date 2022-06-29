@@ -101,3 +101,7 @@
     filter: blur(0);
   }
 }
+
+.btn-rounded {
+  border-radius: 20px;
+}
