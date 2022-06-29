@@ -126,7 +126,7 @@ const Dashboard = (props) => {
   };
 
   return (
-    <>
+    <div className="vh-100 vw-100 d-flex justify-content-center align-items-center homepage-bg p-2">
       <div>
         <button onClick={handleSpotifyLogin}>Spotify Auth</button>
         <button onClick={handleSetAccessToken}>Spotify Set Access Token</button>
@@ -137,7 +137,7 @@ const Dashboard = (props) => {
       </div>
       <div>{JSON.stringify(me)}</div>
       <div>{JSON.stringify(playlists)}</div>
-    </>
+    </div>
   );
 };
 
