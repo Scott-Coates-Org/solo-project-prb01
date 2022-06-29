@@ -1,14 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Logout(props) {
   const { firebase } = props;
+  const navigate = useNavigate();
 
   useEffect(() => {
-    firebase.auth().signOut().then(() => {
-      props.history.replace('/login');
-    });
-
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        navigate("/");
+      });
   }, [props.history]);
 
-  return 'Logging out…';
+  return "Logging out…";
 }
