@@ -60,7 +60,7 @@ const Dashboard = (props) => {
   };
 
   return (
-    <div className="vh-100 vw-100 d-flex justify-content-center align-items-center homepage-bg p-2">
+    <div className="vh-100 vw-100 d-flex flex-column justify-content-center align-items-center homepage-bg p-2">
       <Nav />
       <div>
         <button onClick={handleSpotifyLogin}>Spotify Auth</button>
@@ -69,8 +69,8 @@ const Dashboard = (props) => {
         <button onClick={handleGetMe}>Spotify Get Me</button>
         <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
       </div>
-      {/* <div>{JSON.stringify(me)}</div>
-      <div>{JSON.stringify(playlists)}</div> */}
+      <div className="text-text">{JSON.stringify(spotifyData.user)}</div>
+      <div className="text-text">{JSON.stringify(spotifyData.playlists)}</div>
     </div>
   );
 };
