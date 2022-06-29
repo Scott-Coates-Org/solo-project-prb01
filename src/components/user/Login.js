@@ -27,22 +27,18 @@ export default function Login(props) {
   }, [user, props.history]);
 
   const retVal = (
-    /* todo - wrap in layout container */
-    <div className="container-lg container-fluid mt-lg-5">
-      <div className="row pt-lg-5">
-        <div className="col-md-3 offset-md-2">
-          <h3 className='text-primary'>Log in or create an account</h3>
-          <p>Quickly get started by signing in using your existing accounts.</p>
-        </div>
-        <div className="col-md-6">
-          <Component {...props} setForm={setForm} />
+    <div className='vh-100 vw-100 d-flex justify-contents-center align-items-center'>
+      <div className="container-lg container-fluid mt-lg-5">
+        <div className="row pt-lg-5">
+          <div className="col-md-3 offset-md-2">
+            <h3 className="text-primary">Log in or create an account</h3>
+            <p>Quickly get started by signing in using your existing accounts.</p>
+          </div>
+          <div className="col-md-6">
+            <Component {...props} setForm={setForm} />
+          </div>
         </div>
       </div>
-      {/*
-      <style jsx>{`
-        h3 {
-        }
-      `}</style> */}
     </div>
   );
 
