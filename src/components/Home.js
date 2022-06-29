@@ -1,6 +1,6 @@
 const Home = (props) => {
   return (
-    <div className="vh-100 vw-100 d-flex justify-content-center align-items-center homepage-bg p-2">
+    <div className="vh-100 vw-100 d-flex justify-content-center align-items-center homepage-bg p-2 overflow-hidden">
       <div className="d-flex flex-column text-center justify-content-center">
         <div className="position-relative">
           <p className="text-text logo-large text-shadow mb-n4 mb-xl-n5">
@@ -18,13 +18,31 @@ const Home = (props) => {
           </p>
         </div>
         <div className="mt-4">
-          <a
-            href="#"
-            role="button"
-            className="opacity-0 btn-lg btn-accent text-primary text-decoration-none blur-in font-weight-bold p-2 px-5"
-          >
-            Get Started!
-          </a>
+          <div className="mb-4">
+            <a
+              href="#"
+              role="button"
+              className="opacity-0 btn-lg btn-accent text-primary text-decoration-none blur-in font-weight-bold p-2 px-5"
+            >
+              Sign Up
+            </a>
+          </div>
+          <div className="d-sm-none">
+            <a
+              href="#"
+              role="button"
+              className="opacity-0 btn-lg btn-text text-primary text-decoration-none blur-in font-weight-bold p-2 px-5"
+            >
+              Login
+            </a>
+          </div>
+
+          <p className="text-text mt-2 d-none d-sm-block opacity-0 blur-in">
+            or{" "}
+            <a href="#" className="text-text">
+              <u>login</u>
+            </a>
+          </p>
         </div>
       </div>
     </div>
