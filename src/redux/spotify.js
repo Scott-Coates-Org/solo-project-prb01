@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { useEffect } from "react";
 
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
@@ -55,7 +56,7 @@ export const fetchSpotifyMe = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await _getMe(payload.access_token);
-      thunkAPI.dispatch(appendData(response));
+      thunkAPI.dispatch(appendData({ user: response }));
     } catch (error) {
       console.log(error);
     }
@@ -66,8 +67,15 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
   "spotify/fetchSpotifyPlaylists",
   async (payload, thunkAPI) => {
     try {
-      const response = await _getPlaylists(payload.access_token);
-      thunkAPI.dispatch(appendData(response));
+      const playlists = []
+      let response = await _getPlaylists(payload.user, payload.access_token);
+      playlists.push(...response.items)
+
+      while (response.next) {
+        response = await _getPlaylists(payload.user, payload.access_token, response.next);
+        playlists.push(...response.items);
+      }
+      thunkAPI.dispatch(appendData({ playlists: playlists }));
     } catch (error) {
       console.log(error);
     }
@@ -112,7 +120,7 @@ async function _getRefreshedAccessToken(refreshToken, redirectURI) {
   });
 
   return response.json();
-};
+}
 
 async function _getMe(access_token) {
   const response = await fetch(`${apiURI}/me`, {
@@ -124,16 +132,18 @@ async function _getMe(access_token) {
   });
 
   return response.json();
-};
+}
 
-async function _getPlaylists(access_token) {
-  const response = await fetch(`${apiURI}/users/${data.spotifyId}/playlists`, {
+async function _getPlaylists(user, access_token, uri = null) {
+  const opts = {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + access_token,
     },
-  });
+  };
+
+  const response = await fetch(uri || `${apiURI}/users/${user}/playlists`, opts);
 
   return response.json();
-};
+}

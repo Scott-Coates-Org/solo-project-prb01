@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import spotifyService from "services/spotifyService";
-import { createSpotifyAuth } from "redux/spotify";
+import { createSpotifyAuth, fetchSpotifyMe, fetchSpotifyPlaylists } from "redux/spotify";
 import Nav from "components/nav/Nav";
 import { useSearchParams } from "react-router-dom";
 
@@ -38,34 +37,26 @@ const Dashboard = (props) => {
     );
   };
 
-  const setSpotifyAuth = async (obj) => {
-    console.log(obj);
-    dispatch(createSpotifyAuth(obj));
-  };
-
   const handleSetAccessToken = async () => {
-    // const response = await spotifyService.getAccessToken();
-    setSpotifyAuth({ code, state, redirectURI });
+    dispatch(createSpotifyAuth({ code, state, redirectURI }));
   };
 
-  const handleRefreshAccessToken = async () => {
-    const response = await getRefreshedAccessToken(data.refresh_token);
-    setSpotifyAuth(response);
-  };
+  // const handleRefreshAccessToken = async () => {
+  //   const response = await getRefreshedAccessToken(data.refresh_token);
+  //   setSpotifyAuth(response);
+  // };
 
   const handleGetMe = async () => {
-    const response = await getMe();
-    setMe(response);
-  };
-
-  const handleSetMe = async () => {
-    const response = await getMe();
-    setSpotifyAuth({ spotifyId: response.id });
+    dispatch(fetchSpotifyMe({ access_token: spotifyData.access_token }));
   };
 
   const handleGetPlaylists = async () => {
-    const response = await getPlaylists();
-    setPlaylists(response);
+    dispatch(
+      fetchSpotifyPlaylists({
+        user: spotifyData.user.id,
+        access_token: spotifyData.access_token,
+      })
+    );
   };
 
   return (
@@ -74,10 +65,9 @@ const Dashboard = (props) => {
       <div>
         <button onClick={handleSpotifyLogin}>Spotify Auth</button>
         <button onClick={handleSetAccessToken}>Spotify Set Access Token</button>
-        {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
+        {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button> */}
         <button onClick={handleGetMe}>Spotify Get Me</button>
-        <button onClick={handleSetMe}>Spotify Set Me</button>
-        <button onClick={handleGetPlaylists}>Spotify Get Playlists</button> */}
+        <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
       </div>
       {/* <div>{JSON.stringify(me)}</div>
       <div>{JSON.stringify(playlists)}</div> */}
