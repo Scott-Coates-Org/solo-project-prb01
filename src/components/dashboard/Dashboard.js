@@ -1,23 +1,29 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+// import spotifyService from "services/spotifyService";
 import { createSpotifyAuth } from "redux/spotify";
 import Nav from "components/nav/Nav";
+import { useSearchParams } from "react-router-dom";
 
 const Dashboard = (props) => {
+  const dispatch = useDispatch();
   const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-  const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
   const spotifyState = process.env.REACT_APP_SPOTIFY_STATE;
   const baseURI = "https://accounts.spotify.com";
-  const apiURI = "https://api.spotify.com/v1";
   const redirectURI = `${window.location.origin}/dashboard`;
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
   const state = searchParams.get("state");
-  const dispatch = useDispatch();
-  const { data, isLoaded, hasErrors } = useSelector((state) => state.spotify);
-  const [me, setMe] = useState();
-  const [playlists, setPlaylists] = useState();
+  const {
+    data: spotifyData,
+    isLoaded: spotifyIsLoaded,
+    hasErrors: spotifyHasErrors,
+  } = useSelector((state) => state.spotify);
+  const {
+    data: userData,
+    isLoaded: userIsLoaded,
+    hasErrors: userHasErrors,
+  } = useSelector((state) => state.user);
 
   const handleSpotifyLogin = async () => {
     const scope = [
@@ -32,78 +38,14 @@ const Dashboard = (props) => {
     );
   };
 
-  const getAccessToken = async () => {
-    if (state !== spotifyState) {
-      return console.log("States are not the same");
-    }
-
-    const formBody = new URLSearchParams();
-    formBody.set("grant_type", "authorization_code");
-    formBody.set("code", code);
-    formBody.set("redirect_uri", redirectURI);
-
-    const response = await fetch(`${baseURI}/api/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: "Basic " + new Buffer(clientId + ":" + clientSecret).toString("base64"),
-      },
-      body: formBody,
-    });
-
-    return response.json();
-  };
-
-  const setSpotifyAuth = async (spotifyAuth) => {
-    console.log(spotifyAuth);
-    dispatch(createSpotifyAuth(spotifyAuth));
-  };
-
-  const getRefreshedAccessToken = async (refreshToken) => {
-    const formBody = new URLSearchParams();
-    formBody.set("grant_type", "refresh_token");
-    formBody.set("refresh_token", refreshToken);
-    formBody.set("redirect_uri", redirectURI);
-
-    const response = await fetch(`${baseURI}/api/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: "Basic " + new Buffer(clientId + ":" + clientSecret).toString("base64"),
-      },
-      body: formBody,
-    });
-
-    return response.json();
-  };
-
-  const getMe = async () => {
-    const response = await fetch(`${apiURI}/me`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + data.access_token,
-      },
-    });
-
-    return response.json();
-  };
-
-  const getPlaylists = async () => {
-    const response = await fetch(`${apiURI}/users/${data.spotifyId}/playlists`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + data.access_token,
-      },
-    });
-
-    return response.json();
+  const setSpotifyAuth = async (obj) => {
+    console.log(obj);
+    dispatch(createSpotifyAuth(obj));
   };
 
   const handleSetAccessToken = async () => {
-    const response = await getAccessToken();
-    setSpotifyAuth(response);
+    // const response = await spotifyService.getAccessToken();
+    setSpotifyAuth({ code, state, redirectURI });
   };
 
   const handleRefreshAccessToken = async () => {
@@ -132,13 +74,13 @@ const Dashboard = (props) => {
       <div>
         <button onClick={handleSpotifyLogin}>Spotify Auth</button>
         <button onClick={handleSetAccessToken}>Spotify Set Access Token</button>
-        <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
+        {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
         <button onClick={handleGetMe}>Spotify Get Me</button>
         <button onClick={handleSetMe}>Spotify Set Me</button>
-        <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
+        <button onClick={handleGetPlaylists}>Spotify Get Playlists</button> */}
       </div>
-      <div>{JSON.stringify(me)}</div>
-      <div>{JSON.stringify(playlists)}</div>
+      {/* <div>{JSON.stringify(me)}</div>
+      <div>{JSON.stringify(playlists)}</div> */}
     </div>
   );
 };
