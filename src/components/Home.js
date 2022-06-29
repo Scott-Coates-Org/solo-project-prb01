@@ -18,7 +18,7 @@ const Home = (props) => {
           </p>
         </div>
         <div className="mt-4">
-          <div className="mb-4">
+          <div className="mb-2">
             <a
               href="#"
               role="button"
@@ -27,7 +27,7 @@ const Home = (props) => {
               Sign Up
             </a>
           </div>
-          <div className="d-sm-none">
+          <div className="d-sm-none mt-4">
             <a
               href="#"
               role="button"
@@ -37,7 +37,7 @@ const Home = (props) => {
             </a>
           </div>
 
-          <p className="text-text mt-2 d-none d-sm-block opacity-0 blur-in">
+          <p className="text-text d-none d-sm-block opacity-0 blur-in">
             or{" "}
             <a href="#" className="text-text">
               <u>login</u>
