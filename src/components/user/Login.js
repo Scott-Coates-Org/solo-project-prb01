@@ -28,8 +28,8 @@ export default function Login(props) {
 
   const retVal = (
     <div className='vh-100 vw-100 d-flex justify-contents-center align-items-center'>
-      <div className="container-lg container-fluid mt-lg-5">
-        <div className="row pt-lg-5">
+      <div className="container-lg container-fluid">
+        <div className="row">
           <div className="col-md-3 offset-md-2">
             <h3 className="text-primary">Log in or create an account</h3>
             <p>Quickly get started by signing in using your existing accounts.</p>
