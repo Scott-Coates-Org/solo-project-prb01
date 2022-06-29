@@ -20,7 +20,7 @@ export default function Login(props) {
   // if user exists, redirect to home
   useEffect(() => {
     if (user) {
-      const returnTo = props.history?.location?.pathname || "/";
+      const returnTo = "/dashboard";
 
       navigate(returnTo);
     }
@@ -164,7 +164,7 @@ function EmailLogin(props) {
     // Popup signin flow rather than redirect flow.
     signInFlow: "popup",
     // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-    signInSuccessUrl: props.location.state?.appState.returnTo || "/",
+    signInSuccessUrl: "/dashboard",
     // We will display Google and Facebook as auth providers.
     signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
   };
