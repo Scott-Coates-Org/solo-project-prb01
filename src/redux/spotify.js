@@ -84,3 +84,30 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
     }
   }
 );
+
+export const fetchCombinedPlaylists = createAsyncThunk(
+  "spotify/fetchCombinedPlaylists",
+  async (payload, thunkAPI) => {
+    thunkAPI.dispatch(appendData());
+
+    try {
+      const data = await _fetchCombinedPlaylistsFromDb(payload.uid);
+
+      thunkAPI.dispatch(appendDataSuccess({ combinedPlaylists: data.combinedPlaylists}));
+    } catch (error) {
+      thunkAPI.dispatch(appendDataFailure(error));
+    }
+  }
+);
+
+async function _fetchCombinedPlaylistsFromDb(uid) {
+  const snapshot = await firebaseClient
+    .firestore()
+    .collection("combined_playlists")
+    .where("uid", "==", uid)
+    .get();
+
+  const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+  return data;
+}
