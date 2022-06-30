@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSpotifyAuth, fetchSpotifyMe, fetchSpotifyPlaylists } from "redux/spotify";
 import Nav from "components/nav/Nav";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { addSpotifyAuth, updateSpotifyAuth } from "redux/user";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
   const spotifyState = process.env.REACT_APP_SPOTIFY_STATE;
   const baseURI = "https://accounts.spotify.com";
@@ -26,6 +28,12 @@ const Dashboard = (props) => {
     errorMsg: spotifyErrorMsg,
   } = useSelector((state) => state.spotify);
 
+  const getDifferenceInMins = (fromDate, toDate) => {
+    const diff = Math.floor((toDate - fromDate) / (1000 * 60));
+    console.log(diff);
+    return diff;
+  };
+
   const handleSpotifyLogin = async () => {
     const scope = [
       "playlist-read-collaborative",
@@ -40,11 +48,27 @@ const Dashboard = (props) => {
   };
 
   useEffect(() => {
-    console.log({code, state})
-    if (code && state) {
-      dispatch(createSpotifyAuth({ code, state, redirectURI }));
+    if (!userIsLoaded) return;
+
+    if (userIsLoaded && !userData.access_token && code && state) {
+      dispatch(addSpotifyAuth({ uid: userData.uid, code, state, redirectURI }));
+      navigate("/dashboard");
     }
-  }, [code, state])
+
+    const lastUpdateInMins = getDifferenceInMins(new Date(userData.updatedAt), new Date());
+
+    if (userIsLoaded && userData.access_token && lastUpdateInMins > 60) {
+      console.log("IN HERE");
+      dispatch(
+        updateSpotifyAuth({
+          uid: userData.uid,
+          refresh_token: userData.refresh_token,
+          redirectURI,
+        })
+      );
+      navigate("/dashboard");
+    }
+  }, [userIsLoaded]);
 
   const handleSetAccessToken = async () => {
     dispatch(createSpotifyAuth({ code, state, redirectURI }));

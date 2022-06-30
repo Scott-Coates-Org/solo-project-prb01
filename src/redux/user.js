@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import firebaseClient from "firebase/client";
-import { _getAccessToken } from "components/services/spotifyService";
+import firebase from "firebase/app";
+import { _getAccessToken, _getRefreshedAccessToken } from "components/services/spotifyService";
 
 const initialState = {
   data: {},
@@ -69,7 +70,14 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (payload, thun
     if (!data) {
       thunkAPI.dispatch(createUserData(payload));
     } else {
-      thunkAPI.dispatch(appendDataSuccess({ ...payload, ...data }));
+      thunkAPI.dispatch(
+        appendDataSuccess({
+          ...payload,
+          ...data,
+          createdAt: data.createdAt?.toDate().toISOString(),
+          updatedAt: data.updatedAt?.toDate().toISOString(),
+        })
+      );
     }
   } catch (error) {
     thunkAPI.dispatch(appendDataFailure(error));
@@ -105,7 +113,35 @@ export const addSpotifyAuth = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await _getAccessToken(payload.code, payload.state, payload.redirectURI);
-      thunkAPI.dispatch(updateUserData({ ...payload, ...response }));
+      thunkAPI.dispatch(
+        updateUserData({
+          uid: payload.uid,
+          access_token: response.access_token,
+          refresh_token: response.refresh_token,
+        })
+      );
+    } catch (error) {
+      thunkAPI.dispatch(createDataFailure(error));
+    }
+  }
+);
+
+export const updateSpotifyAuth = createAsyncThunk(
+  "user/updateSpotifyAuth",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await _getRefreshedAccessToken(
+        payload.refresh_token,
+        payload.redirectURI
+      );
+      console.log({ response });
+      thunkAPI.dispatch(
+        updateUserData({
+          uid: payload.uid,
+          access_token: response.access_token,
+          refresh_token: response.refresh_token,
+        })
+      );
     } catch (error) {
       thunkAPI.dispatch(createDataFailure(error));
     }
@@ -125,21 +161,29 @@ async function _fetchUserFromDb(uid) {
 }
 
 async function _createUserData(uid) {
-  const doc = await firebaseClient
-    .firestore()
-    .collection("users")
-    .doc(uid)
-    .set({ uid, access_token: null, refresh_token: null });
+  const doc = await firebaseClient.firestore().collection("users").doc(uid).set({
+    uid,
+    access_token: null,
+    refresh_token: null,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
 
   return doc;
 }
 
 async function _updateUserData(uid, access_token, refresh_token) {
+  console.log("TIME TO UPDATE");
+  console.log({ uid, access_token, refresh_token });
+  const updateFields = refresh_token ? { access_token, refresh_token } : { access_token };
   const doc = await firebaseClient
     .firestore()
     .collection("users")
     .doc(uid)
-    .update({ uid, access_token, refresh_token });
+    .update({
+      ...updateFields,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
 
   return doc;
 }
