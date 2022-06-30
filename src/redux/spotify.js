@@ -1,12 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { _getMe, _getPlaylists } from "components/services/spotifyService";
 
-const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
-const spotifyState = process.env.REACT_APP_SPOTIFY_STATE;
-const baseURI = "https://accounts.spotify.com";
-const apiURI = "https://api.spotify.com/v1";
-
 const initialState = {
   data: {},
   isLoaded: false,
