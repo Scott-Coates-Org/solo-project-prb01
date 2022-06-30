@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import firebaseClient from "firebase/client";
+import { _getAccessToken } from "components/services/spotifyService";
 
 const initialState = {
   data: {},
@@ -64,11 +65,11 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (payload, thun
 
   try {
     const data = await _fetchUserFromDb(payload.uid);
-    
+
     if (!data) {
       thunkAPI.dispatch(createUserData(payload));
     } else {
-      thunkAPI.dispatch(appendDataSuccess({...payload, ...data}));
+      thunkAPI.dispatch(appendDataSuccess({ ...payload, ...data }));
     }
   } catch (error) {
     thunkAPI.dispatch(appendDataFailure(error));
@@ -79,8 +80,32 @@ export const createUserData = createAsyncThunk(
   "user/createUserData",
   async (payload, thunkAPI) => {
     try {
-      const response = await _createUserData(payload.uid);
+      await _createUserData(payload.uid);
       thunkAPI.dispatch(fetchUser(payload));
+    } catch (error) {
+      thunkAPI.dispatch(createDataFailure(error));
+    }
+  }
+);
+
+export const updateUserData = createAsyncThunk(
+  "user/updateUserData",
+  async (payload, thunkAPI) => {
+    try {
+      await _updateUserData(payload.uid, payload.access_token, payload.refresh_token);
+      thunkAPI.dispatch(fetchUser(payload));
+    } catch (error) {
+      thunkAPI.dispatch(createDataFailure(error));
+    }
+  }
+);
+
+export const addSpotifyAuth = createAsyncThunk(
+  "user/addSpotifyAuth",
+  async (payload, thunkAPI) => {
+    try {
+      const response = await _getAccessToken(payload.code, payload.state, payload.redirectURI);
+      thunkAPI.dispatch(updateUserData({ ...payload, ...response }));
     } catch (error) {
       thunkAPI.dispatch(createDataFailure(error));
     }
@@ -103,7 +128,18 @@ async function _createUserData(uid) {
   const doc = await firebaseClient
     .firestore()
     .collection("users")
-    .add({ uid, access_token: null, refresh_token: null });
+    .doc(uid)
+    .set({ uid, access_token: null, refresh_token: null });
+
+  return doc;
+}
+
+async function _updateUserData(uid, access_token, refresh_token) {
+  const doc = await firebaseClient
+    .firestore()
+    .collection("users")
+    .doc(uid)
+    .update({ uid, access_token, refresh_token });
 
   return doc;
 }
