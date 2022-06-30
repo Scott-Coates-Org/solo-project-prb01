@@ -173,8 +173,6 @@ async function _createUserData(uid) {
 }
 
 async function _updateUserData(uid, access_token, refresh_token) {
-  console.log("TIME TO UPDATE");
-  console.log({ uid, access_token, refresh_token });
   const updateFields = refresh_token ? { access_token, refresh_token } : { access_token };
   const doc = await firebaseClient
     .firestore()
