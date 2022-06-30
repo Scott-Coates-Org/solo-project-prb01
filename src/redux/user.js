@@ -1,5 +1,5 @@
-// https://dev.to/thatgalnatalie/how-to-get-started-with-redux-toolkit-41e
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import firebaseClient from "firebase/client";
 
 const initialState = {
   data: {},
@@ -36,6 +36,7 @@ const user = createSlice({
     },
     appendDataSuccess: (state, action) => {
       state.isLoaded = true;
+      state.existsInDb = true;
       state.data = { ...state.data, ...action.payload };
     },
     appendDataFailure: (state, action) => {
@@ -48,16 +49,27 @@ const user = createSlice({
 
 export const reducer = user.reducer;
 
-export const { getData, getDataSuccess, getDataFailure } = user.actions;
+export const {
+  getData,
+  getDataSuccess,
+  getDataFailure,
+  createDataFailure,
+  appendData,
+  appendDataSuccess,
+  appendDataFailure,
+} = user.actions;
 
-export const fetchUser = createAsyncThunk(
-  "user/fetchUser", 
-  async (payload, thunkAPI) => {
+export const fetchUser = createAsyncThunk("user/fetchUser", async (payload, thunkAPI) => {
   thunkAPI.dispatch(appendData());
 
   try {
     const data = await _fetchUserFromDb(payload.uid);
-    thunkAPI.dispatch(appendDataSuccess(data));
+    
+    if (!data) {
+      thunkAPI.dispatch(createUserData(payload));
+    } else {
+      thunkAPI.dispatch(appendDataSuccess({...payload, ...data}));
+    }
   } catch (error) {
     thunkAPI.dispatch(appendDataFailure(error));
   }
@@ -67,7 +79,8 @@ export const createUserData = createAsyncThunk(
   "user/createUserData",
   async (payload, thunkAPI) => {
     try {
-      await _createUserData(payload.uid);
+      const response = await _createUserData(payload.uid);
+      thunkAPI.dispatch(fetchUser(payload));
     } catch (error) {
       thunkAPI.dispatch(createDataFailure(error));
     }
@@ -78,9 +91,10 @@ async function _fetchUserFromDb(uid) {
   const snapshot = await firebaseClient
     .firestore()
     .collection("users")
-    .where("uid", "==", uid);
+    .where("uid", "==", uid)
+    .get();
 
-  const data = snapshot.docs.map((doc) => ({ ...doc.data() }));
+  const data = snapshot.docs[0] ? { ...snapshot.docs[0].data() } : null;
 
   return data;
 }

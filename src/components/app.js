@@ -1,4 +1,3 @@
-// import "bootstrap/dist/css/bootstrap.min.css";
 import "../custom.scss";
 import Home from "components/Home";
 import "../assets/styles/styles.css";
@@ -8,10 +7,10 @@ import Logout from "components/user/Logout";
 import { firebase } from "firebase/client";
 import { createBrowserHistory } from "history";
 import { useEffect } from "react";
-import { Provider, useDispatch } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
 import store from "redux/store";
-import { getData, getDataSuccess } from "redux/user";
+import { appendData, fetchUser } from "redux/user";
 import ErrorBoundary from "components/error-boundary";
 import Dashboard from "./dashboard/Dashboard";
 
@@ -49,14 +48,14 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getData());
+    dispatch(appendData());
   }, []);
 
   const storeUserData = (user) => {
     const providerData = user.providerData[0];
     const userData = { ...providerData, uid: user.uid };
 
-    dispatch(getDataSuccess(userData));
+    dispatch(fetchUser(userData));
   };
 
   return (
