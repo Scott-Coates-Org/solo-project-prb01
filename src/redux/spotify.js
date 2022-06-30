@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { useEffect } from "react";
+import { _getMe, _getPlaylists } from "components/services/spotifyService";
+
 
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
@@ -58,20 +59,6 @@ export const {
   appendDataFailure,
 } = spotify.actions;
 
-export const createSpotifyAuth = createAsyncThunk(
-  "spotify/createSpotifyAuth",
-  async (payload, thunkAPI) => {
-    try {
-      thunkAPI.dispatch(getData());
-      const response = await _getAccessToken(payload.code, payload.state, payload.redirectURI);
-      thunkAPI.dispatch(getDataSuccess(response));
-    } catch (error) {
-      thunkAPI.dispatch(getDataFailure(error));
-
-    }
-  }
-);
-
 export const fetchSpotifyMe = createAsyncThunk(
   "spotify/fetchSpotifyMe",
   async (payload, thunkAPI) => {
@@ -105,72 +92,3 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
     }
   }
 );
-
-async function _getAccessToken(code, state, redirectURI) {
-  if (state !== spotifyState) {
-    return console.log("States are not the same");
-  }
-
-  const formBody = new URLSearchParams();
-  formBody.set("grant_type", "authorization_code");
-  formBody.set("code", code);
-  formBody.set("redirect_uri", redirectURI);
-
-  const response = await fetch(`${baseURI}/api/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + new Buffer(clientId + ":" + clientSecret).toString("base64"),
-    },
-    body: formBody,
-  });
-
-  return response.json();
-}
-
-async function _getRefreshedAccessToken(refreshToken, redirectURI) {
-  const formBody = new URLSearchParams();
-  formBody.set("grant_type", "refresh_token");
-  formBody.set("refresh_token", refreshToken);
-  formBody.set("redirect_uri", redirectURI);
-
-  const response = await fetch(`${baseURI}/api/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + new Buffer(clientId + ":" + clientSecret).toString("base64"),
-    },
-    body: formBody,
-  });
-
-  return response.json();
-}
-
-async function _getMe(access_token) {
-  const response = await fetch(`${apiURI}/me`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-  });
-
-  return response.json();
-}
-
-async function _getPlaylists(user, access_token, uri = null) {
-  const opts = {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-  };
-
-  const response = await fetch(
-    uri || `${apiURI}/users/${user}/playlists?offset=0&limit=50`,
-    opts
-  );
-
-  return response.json();
-}

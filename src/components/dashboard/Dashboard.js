@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createSpotifyAuth, fetchSpotifyMe, fetchSpotifyPlaylists } from "redux/spotify";
+import { fetchSpotifyMe, fetchSpotifyPlaylists } from "redux/spotify";
 import Nav from "components/nav/Nav";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { addSpotifyAuth, updateSpotifyAuth } from "redux/user";
@@ -80,7 +80,7 @@ const Dashboard = (props) => {
   // };
 
   const handleGetMe = async () => {
-    dispatch(fetchSpotifyMe({ access_token: spotifyData.access_token }));
+    dispatch(fetchSpotifyMe({ access_token: userData.access_token }));
   };
 
   const handleGetPlaylists = async () => {
