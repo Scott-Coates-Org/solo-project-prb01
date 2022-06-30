@@ -47,10 +47,6 @@ function App() {
   const props = { history };
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(appendData());
-  }, []);
-
   const storeUserData = (user) => {
     const providerData = user.providerData[0];
     const userData = { ...providerData, uid: user.uid };
