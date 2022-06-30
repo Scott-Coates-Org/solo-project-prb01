@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { _getMe, _getPlaylists } from "components/services/spotifyService";
 
-
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
 const spotifyState = process.env.REACT_APP_SPOTIFY_STATE;
@@ -77,12 +76,11 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       thunkAPI.dispatch(appendData());
-      const playlists = []
+      const playlists = [];
       let response = await _getPlaylists(payload.user, payload.access_token);
-      playlists.push(...response.items)
+      playlists.push(...response.items);
 
       while (response.next) {
-      console.log(response.next);
         response = await _getPlaylists(payload.user, payload.access_token, response.next);
         playlists.push(...response.items);
       }

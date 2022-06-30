@@ -58,7 +58,6 @@ const Dashboard = (props) => {
     const lastUpdateInMins = getDifferenceInMins(new Date(userData.updatedAt), new Date());
 
     if (userIsLoaded && userData.access_token && lastUpdateInMins > 60) {
-      console.log("IN HERE");
       dispatch(
         updateSpotifyAuth({
           uid: userData.uid,
@@ -74,10 +73,14 @@ const Dashboard = (props) => {
     dispatch(createSpotifyAuth({ code, state, redirectURI }));
   };
 
-  // const handleRefreshAccessToken = async () => {
-  //   const response = await getRefreshedAccessToken(data.refresh_token);
-  //   setSpotifyAuth(response);
-  // };
+  const handleRefreshAccessToken = async () => {
+    dispatch(
+        updateSpotifyAuth({
+          uid: userData.uid,
+          refresh_token: userData.refresh_token,
+          redirectURI,
+        }))
+  };
 
   const handleGetMe = async () => {
     dispatch(fetchSpotifyMe({ access_token: userData.access_token }));
@@ -87,7 +90,7 @@ const Dashboard = (props) => {
     dispatch(
       fetchSpotifyPlaylists({
         user: spotifyData.user.id,
-        access_token: spotifyData.access_token,
+        access_token: userData.access_token,
       })
     );
   };
@@ -102,14 +105,13 @@ const Dashboard = (props) => {
           {!userData.access_token && (
             <button onClick={handleSpotifyLogin}>Spotify Auth</button>
           )}
-          <button onClick={handleSetAccessToken}>Spotify Set Access Token</button>
-          {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button> */}
+          <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
           <button onClick={handleGetMe}>Spotify Get Me</button>
           <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
         </div>
       )}
       <div className="text-text">{JSON.stringify(spotifyData.user)}</div>
-      <div className="text-text">{JSON.stringify(spotifyData.playlists)}</div>
+      {/* <div className="text-text">{JSON.stringify(spotifyData.playlists)}</div> */}
     </div>
   );
 };
