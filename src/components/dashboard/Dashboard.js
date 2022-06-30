@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSpotifyAuth, fetchSpotifyMe, fetchSpotifyPlaylists } from "redux/spotify";
 import Nav from "components/nav/Nav";
@@ -14,15 +14,17 @@ const Dashboard = (props) => {
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const {
-    data: spotifyData,
-    isLoaded: spotifyIsLoaded,
-    hasErrors: spotifyHasErrors,
-  } = useSelector((state) => state.spotify);
-  const {
     data: userData,
     isLoaded: userIsLoaded,
     hasErrors: userHasErrors,
+    errorMsg: userErrorMsg,
   } = useSelector((state) => state.user);
+  const {
+    data: spotifyData,
+    isLoaded: spotifyIsLoaded,
+    hasErrors: spotifyHasErrors,
+    errorMsg: spotifyErrorMsg,
+  } = useSelector((state) => state.spotify);
 
   const handleSpotifyLogin = async () => {
     const scope = [
@@ -36,6 +38,13 @@ const Dashboard = (props) => {
       `${baseURI}/authorize?response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${redirectURI}&state=${spotifyState}`
     );
   };
+
+  useEffect(() => {
+    console.log({code, state})
+    if (code && state) {
+      dispatch(createSpotifyAuth({ code, state, redirectURI }));
+    }
+  }, [code, state])
 
   const handleSetAccessToken = async () => {
     dispatch(createSpotifyAuth({ code, state, redirectURI }));
@@ -62,13 +71,19 @@ const Dashboard = (props) => {
   return (
     <div className="vh-100 vw-100 d-flex flex-column justify-content-center align-items-center homepage-bg p-2">
       <Nav />
-      <div>
-        <button onClick={handleSpotifyLogin}>Spotify Auth</button>
-        <button onClick={handleSetAccessToken}>Spotify Set Access Token</button>
-        {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button> */}
-        <button onClick={handleGetMe}>Spotify Get Me</button>
-        <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
-      </div>
+      {!userIsLoaded && "User data loading..."}
+      {userHasErrors && "Error Loading user data..."}
+      {userIsLoaded && (
+        <div>
+          {!userData.access_token && (
+            <button onClick={handleSpotifyLogin}>Spotify Auth</button>
+          )}
+          <button onClick={handleSetAccessToken}>Spotify Set Access Token</button>
+          {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button> */}
+          <button onClick={handleGetMe}>Spotify Get Me</button>
+          <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
+        </div>
+      )}
       <div className="text-text">{JSON.stringify(spotifyData.user)}</div>
       <div className="text-text">{JSON.stringify(spotifyData.playlists)}</div>
     </div>
