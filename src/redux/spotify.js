@@ -24,6 +24,10 @@ const spotify = createSlice({
       state.hasErrors = true;
       state.errorMsg = action.payload;
     },
+    createDataFailure: (state, action) => {
+      state.hasErrors = true;
+      state.errorMsg = action.payload;
+    },
     appendData: (state) => {
       state.isLoaded = false;
       state.hasErrors = false;
@@ -47,6 +51,7 @@ export const {
   getData,
   getDataSuccess,
   getDataFailure,
+  createDataFailure,
   appendData,
   appendDataSuccess,
   appendDataFailure,
@@ -96,6 +101,17 @@ export const fetchCombinedPlaylists = createAsyncThunk(
       thunkAPI.dispatch(appendDataSuccess({ combinedPlaylists: data.combinedPlaylists}));
     } catch (error) {
       thunkAPI.dispatch(appendDataFailure(error));
+    }
+  }
+);
+
+export const createCombinedPlaylist = createAsyncThunk(
+  "spotify/createCombinedPlaylist",
+  async (payload, thunkAPI) => {
+    try {
+      await _createCombinedPlaylist(payload.uid, payload.name, payload.playlists);
+    } catch (error) {
+      thunkAPI.dispatch(createDataFailure(error));
     }
   }
 );
