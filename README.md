@@ -29,10 +29,10 @@ Update your progress by checking off the tasks for each sprint. We will **not** 
 
 ### Sprint 2
 
-- [ ] Technical component 25%
-- [ ] Re-evaluate milestones and features
-- [ ] Setup database, Design & Create collections
-- [ ] Create reducer to add playlists to database
+- [x] Technical component 25%
+- [x] Re-evaluate milestones and features
+- [x] Setup database, Design & Create collections
+- [x] Create reducer to add playlists to database
 
 ### Sprint 3
 
