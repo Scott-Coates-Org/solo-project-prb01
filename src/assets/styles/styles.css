@@ -103,6 +103,10 @@
   }
 }
 
+.form-rounded {
+  border-radius: 10px;
+}
+
 .btn-rounded {
   border-radius: 20px;
 }

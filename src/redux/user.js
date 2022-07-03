@@ -80,6 +80,7 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (payload, thun
       );
     }
   } catch (error) {
+    console.log(error)
     thunkAPI.dispatch(appendDataFailure(error));
   }
 });

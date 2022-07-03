@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { _getMe, _getPlaylists } from "components/services/spotifyService";
+import firebaseClient from "firebase/client";
 
 const initialState = {
   data: {},
@@ -64,7 +65,9 @@ export const fetchSpotifyMe = createAsyncThunk(
       thunkAPI.dispatch(appendData());
       const response = await _getMe(payload.access_token);
       thunkAPI.dispatch(appendDataSuccess({ user: response }));
+      return response.id;
     } catch (error) {
+      console.log(error);
       thunkAPI.dispatch(appendDataFailure(error));
     }
   }
@@ -83,7 +86,10 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
         response = await _getPlaylists(payload.user, payload.access_token, response.next);
         playlists.push(...response.items);
       }
-      thunkAPI.dispatch(appendDataSuccess({ playlists: playlists }));
+      const sortedPlaylists = playlists.sort(
+        (a, b) => a.name.toLowerCase() > b.name.toLowerCase()
+      );
+      thunkAPI.dispatch(appendDataSuccess({ playlists: sortedPlaylists }));
     } catch (error) {
       thunkAPI.dispatch(appendDataFailure(error));
     }
@@ -109,6 +115,7 @@ export const createCombinedPlaylist = createAsyncThunk(
   "spotify/createCombinedPlaylist",
   async (payload, thunkAPI) => {
     try {
+      console.log(payload);
       await _createCombinedPlaylist(payload.uid, payload.name, payload.playlists);
     } catch (error) {
       thunkAPI.dispatch(createDataFailure(error));

@@ -4,6 +4,7 @@ import { fetchSpotifyMe, fetchSpotifyPlaylists } from "redux/spotify";
 import Nav from "components/nav/Nav";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { addSpotifyAuth, updateSpotifyAuth } from "redux/user";
+import CreateComboPlaylist from "components/playlists/CreateComboPlaylist";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -67,7 +68,18 @@ const Dashboard = (props) => {
       );
       navigate("/dashboard");
     }
-  }, [userIsLoaded]);
+
+    if (userIsLoaded && userData.access_token) {
+      dispatch(fetchSpotifyMe({ access_token: userData.access_token })).then((data) => {
+        dispatch(
+          fetchSpotifyPlaylists({
+            user: data.payload,
+            access_token: userData.access_token,
+          })
+        );
+      });
+    }
+  }, [userIsLoaded, userData]);
 
   const handleSetAccessToken = async () => {
     dispatch(createSpotifyAuth({ code, state, redirectURI }));
@@ -97,18 +109,21 @@ const Dashboard = (props) => {
   };
 
   return (
-    <div className="vh-100 vw-100 d-flex flex-column justify-content-center align-items-center homepage-bg p-2">
+    <div className="vh-100 vw-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5">
       <Nav />
       {!userIsLoaded && "User data loading..."}
       {userHasErrors && "Error Loading user data..."}
       {userIsLoaded && (
         <div>
-          {!userData.access_token && (
-            <button onClick={handleSpotifyLogin}>Spotify Auth</button>
-          )}
-          <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
-          <button onClick={handleGetMe}>Spotify Get Me</button>
-          <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
+          <CreateComboPlaylist />
+          <div>
+            {!userData.access_token && (
+              <button onClick={handleSpotifyLogin}>Spotify Auth</button>
+            )}
+            <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
+            <button onClick={handleGetMe}>Spotify Get Me</button>
+            <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
+          </div>
         </div>
       )}
       <div className="text-text">{JSON.stringify(spotifyData.user)}</div>
