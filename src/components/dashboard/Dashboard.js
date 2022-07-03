@@ -49,7 +49,7 @@ const Dashboard = (props) => {
 
   useEffect(() => {
     if (!userIsLoaded) return;
-    
+
     if (userIsLoaded && !userData.access_token && code && state) {
       dispatch(addSpotifyAuth({ uid: userData.uid, code, state, redirectURI }));
       navigate("/dashboard");
