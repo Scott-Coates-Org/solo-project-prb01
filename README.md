@@ -5,14 +5,14 @@
 
 Have you ever wanted to be able to add songs to customize a public playlist in Spotify? Of course you can just clone a public playlist, but what happens if they update it? Are you going to check those playlists every day just to make sure your playlists are in synch? Well, fret no more because the solution is here: SpotList - your friendly Spotify Playlist Combiner with automatic synch.
 
+[Live link to SpotList](https://spotifyprb01.firebaseapp.com/dashboard)
+
 ## Final Deliverable (v1)
 
 App where user creates account and links their Spotify account. Then, adds playlists they want to combine. App will use Spotify API to create a new playlist which is a combination of the 2 playlists. The synching of the playlists will be done manually in v1 with the idea that it becomes a daily/hourly task performed server-side in v2.
 
 
 ## Sprint Progress
-
-Update your progress by checking off the tasks for each sprint. We will **not** be using issues for solo projects.
 
 ### Sprint 1
 
