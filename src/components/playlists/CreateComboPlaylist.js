@@ -66,6 +66,8 @@ const CreateComboPlaylist = (props) => {
         createCombinedPlaylist({
           uid: userData.uid,
           name: data.name,
+          spotifyId: spotifyData.user.id,
+          access_token: userData.access_token,
           playlists: [data.playlist1, data.playlist2],
         })
       ).then(() => {

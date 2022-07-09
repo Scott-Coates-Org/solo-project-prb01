@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { _getMe, _getPlaylists } from "components/services/spotifyService";
+import { _createPlaylist, _getMe, _getPlaylists } from "components/services/spotifyService";
 import firebaseClient from "firebase/client";
+import firebase from "firebase/app";
 
 const initialState = {
   data: {},
@@ -115,10 +116,23 @@ export const createCombinedPlaylist = createAsyncThunk(
   "spotify/createCombinedPlaylist",
   async (payload, thunkAPI) => {
     try {
-      console.log(payload);
-      await _createCombinedPlaylist(payload.uid, payload.name, payload.playlists);
+      console.log(payload.playlists);
+
+      const response = await _createPlaylist(
+        payload.spotifyId,
+        payload.access_token,
+        payload.name
+      );
+      console.log(response);
+      await _createCombinedPlaylist(
+        payload.uid,
+        payload.name,
+        response.id,
+        payload.playlists
+      );
     } catch (error) {
-      thunkAPI.dispatch(createDataFailure(error));
+      console.log(error);
+      thunkAPI.dispatch(createDataFailure(error.message));
     }
   }
 );
@@ -135,12 +149,17 @@ async function _fetchCombinedPlaylistsFromDb(uid) {
   return data;
 }
 
-async function _createCombinedPlaylist(uid, name, playlists) {
-  const doc = await firebaseClient.firestore().collection("combined_playlists").add({
-    uid,
-    name,
-    playlists,
-  });
+async function _createCombinedPlaylist(uid, name, playlist_id, playlists) {
+  const doc = await firebaseClient
+    .firestore()
+    .collection("combined_playlists")
+    .doc(playlist_id)
+    .set({
+      uid,
+      name,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      playlists,
+    });
 
   return doc;
 }

@@ -112,7 +112,7 @@ export async function _deleteSongsFromPlaylist(playlist_id, access_token, tracks
       "Content-Type": "application/json",
       Authorization: "Bearer " + access_token,
     },
-    body: tracks,
+    body: JSON.stringify(tracks),
   };
 
   const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
@@ -121,17 +121,20 @@ export async function _deleteSongsFromPlaylist(playlist_id, access_token, tracks
 }
 
 //API call to create a new playlist for a specific user id
-export async function _createPlaylist(user_id, access_token, name, description) {
+export async function _createPlaylist(user_id, access_token, name, description = "Combined playlist") {
+  const data = {
+    name,
+    description
+  }
+
+  console.log(data)
   const opts = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + access_token,
     },
-    body: {
-      name,
-      description,
-    },
+    body: JSON.stringify(data),
   };
 
   const response = await fetch(`${apiURI}/users/${user_id}/playlists`, opts);
