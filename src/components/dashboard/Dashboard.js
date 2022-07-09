@@ -108,6 +108,21 @@ const Dashboard = (props) => {
     );
   };
 
+  const handleRefreshCombinedPlaylists = async () => {
+    // fetch all combined playlists
+    // loop through combined playlists
+    // loop:
+    //   check playlist still exists, else next
+    //   remove all songs in combined playlist
+    //   loop through playlists
+    //   loop:
+    //     get all songs from playlist, add to array
+    //   remove duplicates?
+    //   add all songs to combined playlist
+
+
+  }
+
   return (
     <div className="vh-100 vw-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5">
       <Nav />
