@@ -119,48 +119,47 @@ const Dashboard = (props) => {
     );
   };
 
+  // admin function to synch all combined playlists
   const handleRefreshCombinedPlaylists = async () => {
-    // fetch all combined playlists
-    // loop through combined playlists
-    // loop:
-    //   pull user info
-    //   refresh token
-    //   check playlist still exists, else next
-    //   get all songs in combined playlist
-    //   remove all songs in combined playlist
-    //   loop through playlists
-    //   loop:
-    //     get all songs from playlist, add to array
-    //   remove duplicates?
-    //   add all songs to combined playlist
-
     try {
+      // fetch all combined playlists
       const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
 
+      // loop through combined playlists
       for (const combo of combinedPlaylists) {
+        // pull user info
         let user = await _fetchUserFromDb(combo.uid);
+        // refresh token
         user = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
 
+        //   check playlist still exists, else next
         const check = await _getPlaylist(combo.id, user.access_token);
         if (!check) continue;
 
+        // get all songs in combined playlist
         const tracks = await _getAllSongsFromPlaylist(combo.id, user.access_token);
         const tracksURI = tracks.map((track) => ({
           uri: track.track.uri,
         }));
 
+        // remove all songs in combined playlist
         while (tracksURI.length > 0) {
           await _deleteSongsFromPlaylist(combo.id, user.access_token, {
             tracks: tracksURI.splice(0, 100),
           });
         }
 
+        // loop through playlists
         const tracksToAdd = [];
         for (const playlist of combo.playlists) {
+          // get all songs from playlist, add to array
           const tracks = await _getAllSongsFromPlaylist(playlist, user.access_token);
           tracksToAdd.push(...tracks.map((track) => track.track.uri));
         }
 
+        // remove duplicates?
+
+        // add all songs to combined playlist
         while (tracksToAdd.length > 0) {
           const response = await _addSongsToPlaylist(
             combo.id,
@@ -169,9 +168,8 @@ const Dashboard = (props) => {
           );
         }
       }
-    } 
-    catch (error) {
-      alert(error.message)
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -190,7 +188,9 @@ const Dashboard = (props) => {
             {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
             <button onClick={handleGetMe}>Spotify Get Me</button>
             <button onClick={handleGetPlaylists}>Spotify Get Playlists</button> */}
-            {userData.admin && <button onClick={handleRefreshCombinedPlaylists}>Refresh All Playlists</button>}
+            {userData.admin && (
+              <button onClick={handleRefreshCombinedPlaylists}>Refresh All Playlists</button>
+            )}
           </div>
         </div>
       )}
