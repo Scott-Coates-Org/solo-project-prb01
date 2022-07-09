@@ -72,3 +72,73 @@ export async function _getPlaylists(user, access_token, uri = null) {
 
   return response.json();
 }
+
+export async function _getAllSongsFromPlaylist(playlist_id, access_token) {
+  const songs = [];
+  let response = await _getSongsFromPlaylist(playlist_id, access_token);
+
+  while (response.next) {
+    response = await _getSongsFromPlaylist(playlist_id, access_token, response.next);
+    songs.push(...response.items);
+  }
+
+  return songs;
+}
+
+async function _getSongsFromPlaylist(playlist_id, access_token, uri = null) {
+  const opts = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+  };
+
+  const response = await fetch(
+    uri || `${apiURI}/playlists/${playlist_id}/tracks?limit=50`,
+    opts
+  );
+
+  return response.json();
+}
+
+
+export async function _deleteSongsFromPlaylist(playlist_id, access_token, tracks) {
+  const opts = {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+    body: tracks
+  };
+
+  const response = await fetch(
+    uri || `${apiURI}/playlists/${playlist_id}/tracks`,
+    opts
+  );
+
+  return response.json();
+}
+
+export async function _createPlaylist(user_id, access_token, name, description) {
+  const opts = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+    body: {
+      name,
+      description
+    },
+  };
+
+  const response = await fetch(uri || `${apiURI}/playlists/${playlist_id}/tracks`, opts);
+
+  return response.json();
+}
+
+// create playlist
+// delete all songs in playlist
+// add songs to playlist
