@@ -36,15 +36,16 @@ App where user creates account and links their Spotify account. Then, adds playl
 
 ### Sprint 3
 
-- [ ] Technical component 50%
-- [ ] Re-evaluate milestones and features
-- [ ] Create functions to perform necessary Spotify actions with API (CRUD)
-- [ ] [*Fill me in with Sprint 3 milestones*]
+- [x] Technical component 50%
+- [x] Re-evaluate milestones and features
+- [x] Create functions to perform necessary Spotify actions with API (CRUD)
 
 ### Sprint 4
 
 - [ ] Technical component 100%
-- [ ] User authentication
+- [ ] Combine playlist on creation
+- [ ] Show combined playlists
+- [ ] Ability to delete combined playlist
 - [ ] Layout & Styling
 
 ## Mockups
