@@ -102,7 +102,9 @@ async function _getSongsFromPlaylist(playlist_id, access_token, uri = null) {
   return response.json();
 }
 
-
+//API call to delete songs from playlist
+//Can only delete 100 at a time
+//Tracks are in array json format: {"tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" },{ "uri": "spotify:track:1301WleyT98MSxVHPZCA6M" }] }
 export async function _deleteSongsFromPlaylist(playlist_id, access_token, tracks) {
   const opts = {
     method: "DELETE",
@@ -110,17 +112,15 @@ export async function _deleteSongsFromPlaylist(playlist_id, access_token, tracks
       "Content-Type": "application/json",
       Authorization: "Bearer " + access_token,
     },
-    body: tracks
+    body: tracks,
   };
 
-  const response = await fetch(
-    uri || `${apiURI}/playlists/${playlist_id}/tracks`,
-    opts
-  );
+  const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
 
   return response.json();
 }
 
+//API call to create a new playlist for a specific user id
 export async function _createPlaylist(user_id, access_token, name, description) {
   const opts = {
     method: "POST",
@@ -130,15 +130,31 @@ export async function _createPlaylist(user_id, access_token, name, description) 
     },
     body: {
       name,
-      description
+      description,
     },
   };
 
-  const response = await fetch(uri || `${apiURI}/playlists/${playlist_id}/tracks`, opts);
+  const response = await fetch(`${apiURI}/users/${user_id}/playlists`, opts);
 
   return response.json();
 }
 
-// create playlist
-// delete all songs in playlist
-// add songs to playlist
+//API call to add tracks to a playlist
+//Can only add 100 tracks at a time
+//Tracks are an array of spotify track uris {"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M",
+export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
+  const opts = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+    body: {
+      uris
+    },
+  };
+
+  const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
+
+  return response.json();
+}
