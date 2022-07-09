@@ -149,7 +149,7 @@ export const updateSpotifyAuth = createAsyncThunk(
   }
 );
 
-async function _fetchUserFromDb(uid) {
+export async function _fetchUserFromDb(uid) {
   const snapshot = await firebaseClient
     .firestore()
     .collection("users")

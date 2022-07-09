@@ -1,10 +1,21 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSpotifyMe, fetchSpotifyPlaylists } from "redux/spotify";
+import {
+  _fetchAllCombinedPlaylistsFromDb,
+  fetchSpotifyMe,
+  fetchSpotifyPlaylists,
+} from "redux/spotify";
 import Nav from "components/nav/Nav";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { addSpotifyAuth, updateSpotifyAuth } from "redux/user";
+import { addSpotifyAuth, updateSpotifyAuth, _fetchUserFromDb } from "redux/user";
 import CreateComboPlaylist from "components/playlists/CreateComboPlaylist";
+import {
+  _addSongsToPlaylist,
+  _deleteSongsFromPlaylist,
+  _getAllSongsFromPlaylist,
+  _getPlaylist,
+  _getRefreshedAccessToken,
+} from "components/services/spotifyService";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -112,7 +123,10 @@ const Dashboard = (props) => {
     // fetch all combined playlists
     // loop through combined playlists
     // loop:
+    //   pull user info
+    //   refresh token
     //   check playlist still exists, else next
+    //   get all songs in combined playlist
     //   remove all songs in combined playlist
     //   loop through playlists
     //   loop:
@@ -120,8 +134,46 @@ const Dashboard = (props) => {
     //   remove duplicates?
     //   add all songs to combined playlist
 
+    try {
+      const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
 
-  }
+      for (const combo of combinedPlaylists) {
+        let user = await _fetchUserFromDb(combo.uid);
+        user = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
+
+        const check = await _getPlaylist(combo.id, user.access_token);
+        if (!check) continue;
+
+        const tracks = await _getAllSongsFromPlaylist(combo.id, user.access_token);
+        const tracksURI = tracks.map((track) => ({
+          uri: track.track.uri,
+        }));
+
+        while (tracksURI.length > 0) {
+          await _deleteSongsFromPlaylist(combo.id, user.access_token, {
+            tracks: tracksURI.splice(0, 100),
+          });
+        }
+
+        const tracksToAdd = [];
+        for (const playlist of combo.playlists) {
+          const tracks = await _getAllSongsFromPlaylist(playlist, user.access_token);
+          tracksToAdd.push(...tracks.map((track) => track.track.uri));
+        }
+
+        while (tracksToAdd.length > 0) {
+          const response = await _addSongsToPlaylist(
+            combo.id,
+            user.access_token,
+            tracksToAdd.splice(0, 100)
+          );
+        }
+      }
+    } 
+    catch (error) {
+      alert(error.message)
+    }
+  };
 
   return (
     <div className="vh-100 vw-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5">
@@ -135,14 +187,13 @@ const Dashboard = (props) => {
             {!userData.access_token && (
               <button onClick={handleSpotifyLogin}>Spotify Auth</button>
             )}
-            <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
+            {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
             <button onClick={handleGetMe}>Spotify Get Me</button>
-            <button onClick={handleGetPlaylists}>Spotify Get Playlists</button>
+            <button onClick={handleGetPlaylists}>Spotify Get Playlists</button> */}
+            {userData.admin && <button onClick={handleRefreshCombinedPlaylists}>Refresh All Playlists</button>}
           </div>
         </div>
       )}
-      <div className="text-text">{JSON.stringify(spotifyData.user)}</div>
-      {/* <div className="text-text">{JSON.stringify(spotifyData.playlists)}</div> */}
     </div>
   );
 };

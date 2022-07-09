@@ -73,9 +73,27 @@ export async function _getPlaylists(user, access_token, uri = null) {
   return response.json();
 }
 
+export async function _getPlaylist(playlist_id, access_token) {
+  const opts = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+  };
+
+  const response = await fetch(
+    `${apiURI}/playlists/${playlist_id}`,
+    opts
+  );
+
+  return response.json();
+}
+
 export async function _getAllSongsFromPlaylist(playlist_id, access_token) {
   const songs = [];
   let response = await _getSongsFromPlaylist(playlist_id, access_token);
+  songs.push(...response.items);
 
   while (response.next) {
     response = await _getSongsFromPlaylist(playlist_id, access_token, response.next);
@@ -146,15 +164,17 @@ export async function _createPlaylist(user_id, access_token, name, description =
 //Can only add 100 tracks at a time
 //Tracks are an array of spotify track uris {"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M",
 export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
+  const data = {
+    uris
+  }
+
   const opts = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + access_token,
     },
-    body: {
-      uris
-    },
+    body: JSON.stringify(data),
   };
 
   const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
