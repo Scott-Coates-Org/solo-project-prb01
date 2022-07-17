@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
+  Col,
   Form,
   FormGroup,
   Input,
@@ -84,64 +85,72 @@ const CreateComboPlaylist = (props) => {
       {spotifyIsLoaded && (
         <Form
           onSubmit={handleSubmit(onSubmit)}
-          className="p-3 my-3 border border-accent form-rounded bg-text"
+          className="p-3 my-3 border border-accent form-rounded text-text"
         >
-          <FormGroup>
-            <Label for="name">
-              New Combined Playlist Name<span className="text-danger">*</span>
+          <h2 className="text-center mb-4">New Combined Playlist</h2>
+          <FormGroup row>
+            <Label for="name" sm={2}>
+              Name<span className="text-danger">*</span>
             </Label>
-            <Input
-              id="name"
-              type="text"
-              {...nameRest}
-              innerRef={nameRef}
-              invalid={errors.name ? true : false}
-            />
+            <Col sm={10}>
+              <Input
+                id="name"
+                type="text"
+                {...nameRest}
+                innerRef={nameRef}
+                invalid={errors.name ? true : false}
+              />
+            </Col>
           </FormGroup>
-          <FormGroup>
-            <Label for="playlist1">
+          <FormGroup row>
+            <Label for="playlist1" sm={2}>
               Playlist 1<span className="text-danger">*</span>
             </Label>
-            <Input
-              id="playlist1"
-              type="select"
-              {...playlist1Rest}
-              innerRef={playlist1Ref}
-              invalid={errors.playlists ? true : false}
-            >
-              <option value="" hidden></option>
-              {spotifyData.playlists &&
-                spotifyData.playlists.map((playlist) => (
-                  <option key={playlist.id} value={playlist.id}>
-                    {playlist.name}
-                  </option>
-                ))}
-            </Input>
+            <Col sm={10}>
+              <Input
+                id="playlist1"
+                type="select"
+                {...playlist1Rest}
+                innerRef={playlist1Ref}
+                invalid={errors.playlists ? true : false}
+              >
+                <option value="" hidden></option>
+                {spotifyData.playlists &&
+                  spotifyData.playlists.map((playlist) => (
+                    <option key={playlist.id} value={playlist.id}>
+                      {playlist.name}
+                    </option>
+                  ))}
+              </Input>
+            </Col>
           </FormGroup>
-          <FormGroup>
-            <Label for="playlist2">
+          <FormGroup row>
+            <Label for="playlist2" sm={2}>
               Playlist 2<span className="text-danger">*</span>
             </Label>
-            <Input
-              id="playlist2"
-              type="select"
-              {...playlist2Rest}
-              innerRef={playlist2Ref}
-              invalid={errors.playlists ? true : false}
-            >
-              <option value="" hidden></option>
-              {spotifyData.playlists &&
-                spotifyData.playlists.map((playlist) => (
-                  <option key={playlist.id} value={playlist.id}>
-                    {playlist.name}
-                  </option>
-                ))}
-            </Input>
+            <Col sm={10}>
+              <Input
+                id="playlist2"
+                type="select"
+                {...playlist2Rest}
+                innerRef={playlist2Ref}
+                invalid={errors.playlists ? true : false}
+              >
+                <option value="" hidden></option>
+                {spotifyData.playlists &&
+                  spotifyData.playlists.map((playlist) => (
+                    <option key={playlist.id} value={playlist.id}>
+                      {playlist.name}
+                    </option>
+                  ))}
+              </Input>
+            </Col>
           </FormGroup>
-
-          <Button type="submit" color="secondary" className="text-primary">
-            Save New Playlist
-          </Button>
+          <div className="d-flex justify-content-center">
+            <Button type="submit" color="secondary" className="text-primary">
+              Save New Playlist
+            </Button>
+          </div>
         </Form>
       )}
     </>
