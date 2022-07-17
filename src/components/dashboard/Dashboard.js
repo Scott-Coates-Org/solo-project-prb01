@@ -185,7 +185,10 @@ const Dashboard = (props) => {
       {userIsLoaded && (
         <div className="mt-5">
           <CreateComboPlaylist />
-          <ListOfComboPlaylists />
+
+          {spotifyIsLoaded && (
+            <ListOfComboPlaylists combinedPlaylists={spotifyData.combinedPlaylists}/>
+          )}
           <div>
             {!userData.access_token && (
               <button onClick={handleSpotifyLogin}>Spotify Auth</button>

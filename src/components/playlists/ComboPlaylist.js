@@ -1,18 +1,20 @@
 import { Accordion, AccordionBody, AccordionHeader, AccordionItem } from "reactstrap";
+import { useState } from "react";
+import Playlist from "./Playlist";
 
-const ComboPlaylist = (props) => {
+const ComboPlaylist = ({ combinedPlaylist, idx }) => {
   const [open, setOpen] = useState("");
   const toggle = (id) => {
-    open === id ? setOpen() : setOpen(id);
+    open === id ? setOpen("") : setOpen(id);
   };
 
   return (
     <Accordion flush toggle={toggle} open={open}>
       <AccordionItem>
-        <AccordionHeader targetId={props.idx}></AccordionHeader>
-        <AccordionBody>
-          {props.playlists.map((playlist) => (
-            <Playlist playlist={playlist} />
+        <AccordionHeader targetId={idx}>{combinedPlaylist.name}</AccordionHeader>
+        <AccordionBody accordionId={idx}>
+          {combinedPlaylist.playlists.map((playlist, playlistIdx) => (
+            <Playlist key={playlist.id} playlist={playlist} idx={playlistIdx} />
           ))}
         </AccordionBody>
       </AccordionItem>
