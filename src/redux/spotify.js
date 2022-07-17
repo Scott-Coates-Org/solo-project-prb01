@@ -102,10 +102,12 @@ export const fetchCombinedPlaylistsByUid = createAsyncThunk(
   async (payload, thunkAPI) => {
     thunkAPI.dispatch(appendData());
 
+    console.log("IN HERE");
+
     try {
       const data = await _fetchCombinedPlaylistsByUidFromDb(payload.uid);
 
-      thunkAPI.dispatch(appendDataSuccess({ combinedPlaylists: data.combinedPlaylists }));
+      thunkAPI.dispatch(appendDataSuccess({ combinedPlaylists: data }));
     } catch (error) {
       thunkAPI.dispatch(appendDataFailure(error));
     }
@@ -124,12 +126,7 @@ export const createCombinedPlaylist = createAsyncThunk(
         payload.name
       );
       console.log(response);
-      await _createCombinedPlaylist(
-        payload.uid,
-        payload.name,
-        response.id,
-        payload.playlists
-      );
+      await _createCombinedPlaylist(payload.uid, payload.name, response.id, payload.playlists);
     } catch (error) {
       console.log(error);
       thunkAPI.dispatch(createDataFailure(error.message));
@@ -138,22 +135,28 @@ export const createCombinedPlaylist = createAsyncThunk(
 );
 
 async function _fetchCombinedPlaylistsByUidFromDb(uid) {
+  console.log({ uid });
   const snapshot = await firebaseClient
     .firestore()
     .collection("combined_playlists")
     .where("uid", "==", uid)
     .get();
 
-  const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  console.log(snapshot);
+
+  const data = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+    updatedAt: doc.updatedAt?.toDate().toISOString(),
+  }));
+
+  console.log({ data });
 
   return data;
 }
 
 export async function _fetchAllCombinedPlaylistsFromDb() {
-  const snapshot = await firebaseClient
-    .firestore()
-    .collection("combined_playlists")
-    .get();
+  const snapshot = await firebaseClient.firestore().collection("combined_playlists").get();
 
   const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 

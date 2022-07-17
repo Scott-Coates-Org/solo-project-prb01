@@ -90,7 +90,7 @@ const Dashboard = (props) => {
             access_token: userData.access_token,
           })
         );
-
+        
         dispatch(fetchCombinedPlaylistsByUid({ uid: userData.uid }));
       });
     }
