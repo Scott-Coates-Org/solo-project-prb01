@@ -157,7 +157,7 @@ const Dashboard = (props) => {
         const tracksToAdd = [];
         for (const playlist of combo.playlists) {
           // get all songs from playlist, add to array
-          const tracks = await _getAllSongsFromPlaylist(playlist, user.access_token);
+          const tracks = await _getAllSongsFromPlaylist(playlist.id, user.access_token);
           tracksToAdd.push(...tracks.map((track) => track.track.uri));
         }
 
