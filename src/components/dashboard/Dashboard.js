@@ -179,7 +179,7 @@ const Dashboard = (props) => {
       {!userIsLoaded && "User data loading..."}
       {userHasErrors && "Error Loading user data..."}
       {userIsLoaded && (
-        <div>
+        <div className="mt-5">
           <CreateComboPlaylist />
           <div>
             {!userData.access_token && (
