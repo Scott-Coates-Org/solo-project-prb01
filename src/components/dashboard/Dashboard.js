@@ -4,6 +4,7 @@ import {
   _fetchAllCombinedPlaylistsFromDb,
   fetchSpotifyMe,
   fetchSpotifyPlaylists,
+  fetchCombinedPlaylistsByUid,
 } from "redux/spotify";
 import Nav from "components/nav/Nav";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -16,6 +17,7 @@ import {
   _getPlaylist,
   _getRefreshedAccessToken,
 } from "components/services/spotifyService";
+import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -88,6 +90,8 @@ const Dashboard = (props) => {
             access_token: userData.access_token,
           })
         );
+
+        dispatch(fetchCombinedPlaylistsByUid({ uid: userData.uid }));
       });
     }
   }, [userIsLoaded, userData]);
@@ -181,6 +185,7 @@ const Dashboard = (props) => {
       {userIsLoaded && (
         <div className="mt-5">
           <CreateComboPlaylist />
+          <ListOfComboPlaylists />
           <div>
             {!userData.access_token && (
               <button onClick={handleSpotifyLogin}>Spotify Auth</button>

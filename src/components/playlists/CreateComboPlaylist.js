@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
@@ -9,7 +8,7 @@ import {
   Input,
   Label,
 } from "reactstrap";
-import { createCombinedPlaylist, fetchSpotifyPlaylists } from "redux/spotify";
+import { createCombinedPlaylist } from "redux/spotify";
 
 const CreateComboPlaylist = (props) => {
   const dispatch = useDispatch();
@@ -26,10 +25,6 @@ const CreateComboPlaylist = (props) => {
     errorMsg: spotifyErrorMsg,
   } = useSelector((state) => state.spotify);
 
-  // useEffect(() => {
-  //   dispatch(fetchSpotifyPlaylists());
-  // }, [dispatch]);
-
   const {
     register,
     handleSubmit,
@@ -42,8 +37,8 @@ const CreateComboPlaylist = (props) => {
     mode: "onChange",
     defaultValues: {
       name: "",
-      playlist1: "",
-      playlist2: "",
+      playlist1: {},
+      playlist2: {},
     },
   });
 
@@ -63,13 +58,15 @@ const CreateComboPlaylist = (props) => {
     if (Object.keys(errors).length) {
       alert("Error saving product: " + JSON.stringify(errors));
     } else {
+      console.log(data.playlist1)
+
       dispatch(
         createCombinedPlaylist({
           uid: userData.uid,
           name: data.name,
           spotifyId: spotifyData.user.id,
           access_token: userData.access_token,
-          playlists: [data.playlist1, data.playlist2],
+          playlists: [JSON.parse(data.playlist1), JSON.parse(data.playlist2)],
         })
       ).then(() => {
         reset();
@@ -117,7 +114,10 @@ const CreateComboPlaylist = (props) => {
                 <option value="" hidden></option>
                 {spotifyData.playlists &&
                   spotifyData.playlists.map((playlist) => (
-                    <option key={playlist.id} value={playlist.id}>
+                    <option
+                      key={playlist.id}
+                      value={JSON.stringify({ name: playlist.name, id: playlist.id })}
+                    >
                       {playlist.name}
                     </option>
                   ))}
@@ -139,7 +139,10 @@ const CreateComboPlaylist = (props) => {
                 <option value="" hidden></option>
                 {spotifyData.playlists &&
                   spotifyData.playlists.map((playlist) => (
-                    <option key={playlist.id} value={playlist.id}>
+                    <option
+                      key={playlist.id}
+                      value={JSON.stringify({ name: playlist.name, id: playlist.id })}
+                    >
                       {playlist.name}
                     </option>
                   ))}

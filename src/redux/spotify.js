@@ -97,13 +97,13 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
   }
 );
 
-export const fetchCombinedPlaylists = createAsyncThunk(
+export const fetchCombinedPlaylistsByUid = createAsyncThunk(
   "spotify/fetchCombinedPlaylists",
   async (payload, thunkAPI) => {
     thunkAPI.dispatch(appendData());
 
     try {
-      const data = await _fetchCombinedPlaylistsFromDb(payload.uid);
+      const data = await _fetchCombinedPlaylistsByUidFromDb(payload.uid);
 
       thunkAPI.dispatch(appendDataSuccess({ combinedPlaylists: data.combinedPlaylists }));
     } catch (error) {
@@ -137,7 +137,7 @@ export const createCombinedPlaylist = createAsyncThunk(
   }
 );
 
-async function _fetchCombinedPlaylistsFromDb(uid) {
+async function _fetchCombinedPlaylistsByUidFromDb(uid) {
   const snapshot = await firebaseClient
     .firestore()
     .collection("combined_playlists")
