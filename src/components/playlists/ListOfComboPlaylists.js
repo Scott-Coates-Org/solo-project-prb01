@@ -17,6 +17,7 @@ const ListOfComboPlaylists = ({ combinedPlaylists }) => {
       {spotifyHasErrors && "Error Loading"}
       {spotifyIsLoaded && (
         <Container className="p-3 my-3 border border-accent form-rounded text-text d-grid gap-3">
+          <h2 className="text-center mb-4">{spotifyData.user.id}'s Combined Playlists</h2>
           {combinedPlaylists.map((combinedPlaylist) => (
             <ComboPlaylist
               key={combinedPlaylist.id}
