@@ -1,8 +1,11 @@
-import { useForm } from "react-hook-form";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlusCircle, faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+import { Controller, useForm, useFieldArray } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Col, Form, FormGroup, Input, Label } from "reactstrap";
+import { Button, Col, Row, Form, FormGroup, Input, Label } from "reactstrap";
 import { createCombinedPlaylist, fetchCombinedPlaylistsByUid } from "redux/spotify";
 import { refreshNewCombinedPlaylist } from "utils/utils";
+import { useEffect } from "react";
 
 const CreateComboPlaylist = (props) => {
   const dispatch = useDispatch();
@@ -21,19 +24,20 @@ const CreateComboPlaylist = (props) => {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
-    resetField,
-    getValues,
-    watch,
     formState: { errors },
   } = useForm({
     mode: "onChange",
     defaultValues: {
       name: "",
-      playlist1: {},
-      playlist2: {},
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "playlists",
   });
 
   const msgIfEmpty = (name = "") => `${name} cannot be empty`;
@@ -41,24 +45,24 @@ const CreateComboPlaylist = (props) => {
   const { ref: nameRef, ...nameRest } = register("name", {
     required: msgIfEmpty("Name"),
   });
-  const { ref: playlist1Ref, ...playlist1Rest } = register("playlist1", {
-    required: msgIfEmpty("Playlist"),
-  });
-  const { ref: playlist2Ref, ...playlist2Rest } = register("playlist2", {
-    required: msgIfEmpty("Playlist"),
-  });
+
+  useEffect(() => {
+    if(fields.length < 2) append("")
+  }, [fields])
 
   const onSubmit = async (data) => {
     if (Object.keys(errors).length) {
       alert("Error saving product: " + JSON.stringify(errors));
     } else {
+      const playlists = data.playlists.map((playlist) => JSON.parse(playlist.playlist));
+
       const { payload: combinedPlaylistId } = await dispatch(
         createCombinedPlaylist({
           uid: userData.uid,
           name: data.name,
           spotifyId: spotifyData.user.id,
           access_token: userData.access_token,
-          playlists: [JSON.parse(data.playlist1), JSON.parse(data.playlist2)],
+          playlists,
         })
       );
 
@@ -89,7 +93,7 @@ const CreateComboPlaylist = (props) => {
             <Label for="name" sm={2}>
               Name<span className="text-danger">*</span>
             </Label>
-            <Col sm={10}>
+            <Col sm={8}>
               <Input
                 id="name"
                 type="text"
@@ -99,56 +103,59 @@ const CreateComboPlaylist = (props) => {
               />
             </Col>
           </FormGroup>
-          <FormGroup row>
-            <Label for="playlist1" sm={2}>
-              Playlist 1<span className="text-danger">*</span>
-            </Label>
-            <Col sm={10}>
-              <Input
-                id="playlist1"
-                type="select"
-                {...playlist1Rest}
-                innerRef={playlist1Ref}
-                invalid={errors.playlists ? true : false}
-              >
-                <option value="" hidden></option>
-                {spotifyData.playlists &&
-                  spotifyData.playlists.map((playlist) => (
-                    <option
-                      key={playlist.id}
-                      value={JSON.stringify({ name: playlist.name, id: playlist.id })}
+          <ul style={{ listStyleType: "none", padding: 0 }}>
+            {fields.map((item, idx) => (
+              <li key={item.id}>
+                <FormGroup row>
+                  <Label for="playlist" sm={2}>
+                    Playlist<span className="text-danger">*</span>
+                  </Label>
+                  <Col sm={8}>
+                    <Controller
+                      name={`playlists.${idx}.playlist`}
+                      control={control}
+                      render={({ field }) => (
+                        <Input id="playlist" type="select" {...field}>
+                          <option value="" hidden></option>
+                          {spotifyData.playlists &&
+                            spotifyData.playlists.map((playlist) => (
+                              <option
+                                key={playlist.id}
+                                value={JSON.stringify({
+                                  name: playlist.name,
+                                  id: playlist.id,
+                                })}
+                              >
+                                {playlist.name}
+                              </option>
+                            ))}
+                        </Input>
+                      )}
+                    />
+                  </Col>
+                  <Col sm={2} className="d-flex align-items-center justify-content-start">
+                    <Button
+                      outline
+                      color="accent"
+                      onClick={() => remove(idx)}
+                      className="rounded-circle fs-6"
                     >
-                      {playlist.name}
-                    </option>
-                  ))}
-              </Input>
+                      <FontAwesomeIcon icon={faMinusCircle} />
+                    </Button>
+                  </Col>
+                </FormGroup>
+              </li>
+            ))}
+          </ul>
+          <Row>
+            <Col sm={10}></Col>
+            <Col sm={2} className="d-flex align-items-center justify-content-start">
+              <Button outline onClick={() => append("")} className="rounded-circle fs-6">
+                <FontAwesomeIcon icon={faPlusCircle} />
+              </Button>
             </Col>
-          </FormGroup>
-          <FormGroup row>
-            <Label for="playlist2" sm={2}>
-              Playlist 2<span className="text-danger">*</span>
-            </Label>
-            <Col sm={10}>
-              <Input
-                id="playlist2"
-                type="select"
-                {...playlist2Rest}
-                innerRef={playlist2Ref}
-                invalid={errors.playlists ? true : false}
-              >
-                <option value="" hidden></option>
-                {spotifyData.playlists &&
-                  spotifyData.playlists.map((playlist) => (
-                    <option
-                      key={playlist.id}
-                      value={JSON.stringify({ name: playlist.name, id: playlist.id })}
-                    >
-                      {playlist.name}
-                    </option>
-                  ))}
-              </Input>
-            </Col>
-          </FormGroup>
+          </Row>
+
           <div className="d-flex justify-content-center">
             <Button type="submit" color="secondary" className="text-primary">
               Save New Playlist
