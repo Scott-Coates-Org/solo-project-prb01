@@ -22,7 +22,6 @@ const ComboPlaylist = ({ combinedPlaylist, idx }) => {
   };
 
   const deleteComboPlaylist = (id) => {
-    console.log({ id });
     if (confirm("Are you sure you want to delete?")) {
       dispatch(deleteCombinedPlaylist({ id, access_token }));
     }
