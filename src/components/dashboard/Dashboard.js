@@ -18,7 +18,7 @@ import {
   _getRefreshedAccessToken,
 } from "components/services/spotifyService";
 import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
-import { adminRefreshAllCombinedPlaylists } from "utils/utils";
+import { adminRefreshAllCombinedPlaylists, spotifyLogin } from "utils/utils";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -49,17 +49,8 @@ const Dashboard = (props) => {
     return diff;
   };
 
-  const handleSpotifyLogin = async () => {
-    const scope = [
-      "playlist-read-collaborative",
-      "playlist-modify-public",
-      "playlist-read-private",
-      "playlist-modify-private",
-    ].join(" ");
-
-    window.location.replace(
-      `${baseURI}/authorize?response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${redirectURI}&state=${spotifyState}`
-    );
+  const handleSpotifyLogin = () => {
+    spotifyLogin();
   };
 
   useEffect(() => {
@@ -137,6 +128,7 @@ const Dashboard = (props) => {
             <ListOfComboPlaylists combinedPlaylists={spotifyData.combinedPlaylists} />
           )}
           <div>
+            <button onClick={handleSpotifyLogin}>Spotify Auth</button>
             {!userData.access_token && (
               <button onClick={handleSpotifyLogin}>Spotify Auth</button>
             )}
