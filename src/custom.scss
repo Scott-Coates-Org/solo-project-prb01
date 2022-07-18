@@ -19,5 +19,7 @@ $custom-spacers: (
   10: $spacer * 7
 );
 $spacers: map-merge($spacers, $custom-spacers);
+
+$enable-negative-margins: true;
     
 @import "~bootstrap/scss/bootstrap";

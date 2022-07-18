@@ -10,10 +10,10 @@
 
 .text-shadow {
   text-shadow:
-      -1px -1px 5px var(--primary),
-      -1px 1px 5px var(--primary),
-      1px -1px 5px var(--primary),
-      1px 1px 5px var(--primary);
+      -1px -1px 5px var(--bs-primary),
+      -1px 1px 5px var(--bs-primary),
+      1px -1px 5px var(--bs-primary),
+      1px 1px 5px var(--bs-primary);
 }
 
 .logo-large {
@@ -23,7 +23,7 @@
   height: max-content;
   font-size: 5rem;
   font-size: clamp(5rem, 3.4rem + 8vw, 13rem);
-  text-shadow: 0px 0px 100px var(--primary);
+  text-shadow: 0px 0px 100px var(--bs-primary);
   user-select: none;
 }
 
