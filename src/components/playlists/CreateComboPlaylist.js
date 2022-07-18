@@ -62,15 +62,11 @@ const CreateComboPlaylist = (props) => {
         })
       );
 
-      console.log({ combinedPlaylistId });
-
       const { payload: combinedPlaylists } = await dispatch(
         fetchCombinedPlaylistsByUid({ uid: userData.uid })
       );
 
-      console.log({ combinedPlaylists });
       const combo = combinedPlaylists.filter((playlist) => playlist.id === combinedPlaylistId);
-      console.log({ combo });
 
       await refreshNewCombinedPlaylist(combo[0], userData.access_token);
 
