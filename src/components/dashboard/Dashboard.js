@@ -106,7 +106,7 @@ const Dashboard = (props) => {
       {!userIsLoaded && "User data loading..."}
       {userHasErrors && "Error Loading user data..."}
       {userIsLoaded && !userHasErrors && !userData.access_token && (
-        <div className="h-100 d-flex flex-column justify-content-center align-items-center">
+        <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column justify-content-center align-items-center overflow-hidden">
           <h1 className="text-text mb-3">Connect your Spotify Account to start</h1>
           <div className="d-flex justify-content-center">
             <Button
