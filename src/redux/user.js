@@ -135,7 +135,7 @@ export const updateSpotifyAuth = createAsyncThunk(
         payload.refresh_token,
         payload.redirectURI
       );
-      console.log({ response });
+      
       thunkAPI.dispatch(
         updateUserData({
           uid: payload.uid,
