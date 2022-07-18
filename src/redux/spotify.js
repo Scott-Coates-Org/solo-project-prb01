@@ -113,8 +113,6 @@ export const fetchCombinedPlaylistsByUid = createAsyncThunk(
   async (payload, thunkAPI) => {
     thunkAPI.dispatch(appendData());
 
-    console.log("IN HERE");
-
     try {
       const data = await _fetchCombinedPlaylistsByUidFromDb(payload.uid);
 
@@ -156,7 +154,6 @@ export const deleteCombinedPlaylist = createAsyncThunk(
   "spotify/deleteCombinedPlaylist",
   async (payload, thunkAPI) => {
     try {
-      console.log(payload);
       const response = await _unfollowPlaylist(payload.id, payload.access_token);
       const snapshot = await _deleteCombinedPlaylistFromDb(payload.id);
       thunkAPI.dispatch(removeCombinedPlaylist(payload));
@@ -167,22 +164,17 @@ export const deleteCombinedPlaylist = createAsyncThunk(
 );
 
 async function _fetchCombinedPlaylistsByUidFromDb(uid) {
-  console.log({ uid });
   const snapshot = await firebaseClient
     .firestore()
     .collection("combined_playlists")
     .where("uid", "==", uid)
     .get();
 
-  console.log(snapshot);
-
   const data = snapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
     updatedAt: doc.updatedAt?.toDate().toISOString(),
   }));
-
-  console.log({ data });
 
   return data;
 }
