@@ -159,7 +159,6 @@ export async function _createPlaylist(user_id, access_token, name, description =
     description
   }
 
-  console.log(data)
   const opts = {
     method: "POST",
     headers: {
