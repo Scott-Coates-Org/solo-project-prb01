@@ -46,8 +46,10 @@ const CreateComboPlaylist = (props) => {
     required: msgIfEmpty("Name"),
   });
 
+  // Limit # of playlists
   useEffect(() => {
     if(fields.length < 2) append("")
+    if(fields.length > 5) remove(fields.length - 1)
   }, [fields])
 
   const onSubmit = async (data) => {
