@@ -18,6 +18,7 @@ import {
   _getRefreshedAccessToken,
 } from "components/services/spotifyService";
 import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
+import { adminRefreshAllCombinedPlaylists } from "utils/utils";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -90,7 +91,7 @@ const Dashboard = (props) => {
             access_token: userData.access_token,
           })
         );
-        
+
         dispatch(fetchCombinedPlaylistsByUid({ uid: userData.uid }));
       });
     }
@@ -123,60 +124,6 @@ const Dashboard = (props) => {
     );
   };
 
-  // admin function to synch all combined playlists
-  const handleRefreshCombinedPlaylists = async () => {
-    try {
-      // fetch all combined playlists
-      const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
-
-      // loop through combined playlists
-      for (const combo of combinedPlaylists) {
-        // pull user info
-        let user = await _fetchUserFromDb(combo.uid);
-        // refresh token
-        user = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
-
-        //   check playlist still exists, else next
-        const check = await _getPlaylist(combo.id, user.access_token);
-        if (!check) continue;
-
-        // get all songs in combined playlist
-        const tracks = await _getAllSongsFromPlaylist(combo.id, user.access_token);
-        const tracksURI = tracks.map((track) => ({
-          uri: track.track.uri,
-        }));
-
-        // remove all songs in combined playlist
-        while (tracksURI.length > 0) {
-          await _deleteSongsFromPlaylist(combo.id, user.access_token, {
-            tracks: tracksURI.splice(0, 100),
-          });
-        }
-
-        // loop through playlists
-        const tracksToAdd = [];
-        for (const playlist of combo.playlists) {
-          // get all songs from playlist, add to array
-          const tracks = await _getAllSongsFromPlaylist(playlist.id, user.access_token);
-          tracksToAdd.push(...tracks.map((track) => track.track.uri));
-        }
-
-        // remove duplicates?
-
-        // add all songs to combined playlist
-        while (tracksToAdd.length > 0) {
-          const response = await _addSongsToPlaylist(
-            combo.id,
-            user.access_token,
-            tracksToAdd.splice(0, 100)
-          );
-        }
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
   return (
     <div className="vh-100 vw-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5">
       <Nav />
@@ -187,7 +134,7 @@ const Dashboard = (props) => {
           <CreateComboPlaylist />
 
           {spotifyIsLoaded && (
-            <ListOfComboPlaylists combinedPlaylists={spotifyData.combinedPlaylists}/>
+            <ListOfComboPlaylists combinedPlaylists={spotifyData.combinedPlaylists} />
           )}
           <div>
             {!userData.access_token && (
@@ -196,9 +143,6 @@ const Dashboard = (props) => {
             {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
             <button onClick={handleGetMe}>Spotify Get Me</button>
             <button onClick={handleGetPlaylists}>Spotify Get Playlists</button> */}
-            {userData.admin && (
-              <button onClick={handleRefreshCombinedPlaylists}>Refresh All Playlists</button>
-            )}
           </div>
         </div>
       )}

@@ -1,5 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { _createPlaylist, _getMe, _getPlaylists } from "components/services/spotifyService";
+import {
+  _createPlaylist,
+  _getMe,
+  _getPlaylists,
+  _unfollowPlaylist,
+} from "components/services/spotifyService";
 import firebaseClient from "firebase/client";
 import firebase from "firebase/app";
 
@@ -44,6 +49,11 @@ const spotify = createSlice({
       state.hasErrors = true;
       state.errorMsg = action.payload;
     },
+    removeCombinedPlaylist: (state, action) => {
+      state.data.combinedPlaylists = state.data.combinedPlaylists.filter(
+        (playlist) => playlist.id !== action.payload.id
+      );
+    },
   },
 });
 
@@ -57,6 +67,7 @@ export const {
   appendData,
   appendDataSuccess,
   appendDataFailure,
+  removeCombinedPlaylist,
 } = spotify.actions;
 
 export const fetchSpotifyMe = createAsyncThunk(
@@ -108,6 +119,8 @@ export const fetchCombinedPlaylistsByUid = createAsyncThunk(
       const data = await _fetchCombinedPlaylistsByUidFromDb(payload.uid);
 
       thunkAPI.dispatch(appendDataSuccess({ combinedPlaylists: data }));
+
+      return data;
     } catch (error) {
       thunkAPI.dispatch(appendDataFailure(error));
     }
@@ -118,18 +131,37 @@ export const createCombinedPlaylist = createAsyncThunk(
   "spotify/createCombinedPlaylist",
   async (payload, thunkAPI) => {
     try {
-      console.log(payload.playlists);
-
       const response = await _createPlaylist(
         payload.spotifyId,
         payload.access_token,
         payload.name
       );
-      console.log(response);
-      await _createCombinedPlaylist(payload.uid, payload.name, response.id, payload.playlists);
+      await _createCombinedPlaylistInDb(
+        payload.uid,
+        payload.name,
+        response.id,
+        payload.playlists
+      );
+
+      return response.id;
     } catch (error) {
       console.log(error);
       thunkAPI.dispatch(createDataFailure(error.message));
+      return false
+    }
+  }
+);
+
+export const deleteCombinedPlaylist = createAsyncThunk(
+  "spotify/deleteCombinedPlaylist",
+  async (payload, thunkAPI) => {
+    try {
+      console.log(payload);
+      const response = await _unfollowPlaylist(payload.id, payload.access_token);
+      const snapshot = await _deleteCombinedPlaylistFromDb(payload.id);
+      thunkAPI.dispatch(removeCombinedPlaylist(payload));
+    } catch (error) {
+      console.log(error);
     }
   }
 );
@@ -163,7 +195,7 @@ export async function _fetchAllCombinedPlaylistsFromDb() {
   return data;
 }
 
-async function _createCombinedPlaylist(uid, name, playlist_id, playlists) {
+async function _createCombinedPlaylistInDb(uid, name, playlist_id, playlists) {
   const doc = await firebaseClient
     .firestore()
     .collection("combined_playlists")
@@ -176,4 +208,14 @@ async function _createCombinedPlaylist(uid, name, playlist_id, playlists) {
     });
 
   return doc;
+}
+
+async function _deleteCombinedPlaylistFromDb(id) {
+  const snapshot = await firebaseClient
+    .firestore()
+    .collection("combined_playlists")
+    .doc(id)
+    .delete();
+
+  return snapshot;
 }

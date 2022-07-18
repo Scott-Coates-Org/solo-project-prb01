@@ -1,14 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Button,
-  Col,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-} from "reactstrap";
-import { createCombinedPlaylist } from "redux/spotify";
+import { Button, Col, Form, FormGroup, Input, Label } from "reactstrap";
+import { createCombinedPlaylist, fetchCombinedPlaylistsByUid } from "redux/spotify";
+import { refreshNewCombinedPlaylist } from "utils/utils";
 
 const CreateComboPlaylist = (props) => {
   const dispatch = useDispatch();
@@ -54,13 +48,11 @@ const CreateComboPlaylist = (props) => {
     required: msgIfEmpty("Playlist"),
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (Object.keys(errors).length) {
       alert("Error saving product: " + JSON.stringify(errors));
     } else {
-      console.log(data.playlist1)
-
-      dispatch(
+      const { payload: combinedPlaylistId } = await dispatch(
         createCombinedPlaylist({
           uid: userData.uid,
           name: data.name,
@@ -68,10 +60,22 @@ const CreateComboPlaylist = (props) => {
           access_token: userData.access_token,
           playlists: [JSON.parse(data.playlist1), JSON.parse(data.playlist2)],
         })
-      ).then(() => {
-        reset();
-        console.log("added to DB");
-      });
+      );
+
+      console.log({ combinedPlaylistId });
+
+      const { payload: combinedPlaylists } = await dispatch(
+        fetchCombinedPlaylistsByUid({ uid: userData.uid })
+      );
+
+      console.log({ combinedPlaylists });
+      const combo = combinedPlaylists.filter((playlist) => playlist.id === combinedPlaylistId);
+      console.log({ combo });
+
+      await refreshNewCombinedPlaylist(combo[0], userData.access_token);
+
+      reset();
+      console.log("added to Spotify & DB");
     }
   };
 
