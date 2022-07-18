@@ -110,12 +110,12 @@ function LoginForm(props) {
   const retVal = (
     <Form>
       <FormGroup>
-        <p className="small text-left text-muted font-weight-light">
+        <p className="small text-center text-muted font-weight-light">
           By proceeding, you are agreeing to the {terms} and {privacy}.
         </p>
       </FormGroup>
-      <Row form>
-        <Col md={6}>
+      <Row>
+        <Col md={6} className="d-flex justify-content-center">
           <FormGroup>
             {/*   <Label for="about.firstName">First Name</Label>
             <Input type="text" /> */}
@@ -123,12 +123,12 @@ function LoginForm(props) {
               className="btn-block btn-light d-flex flex-row justify-content-around align-items-center"
               onClick={handleGoogleLogin}
             >
-              <FontAwesomeIcon icon={faGoogle} className="mr-lg-1" />
+              <FontAwesomeIcon icon={faGoogle} className="me-2" />
               Continue with Google
             </Button>
           </FormGroup>
         </Col>
-        <Col md={6}>
+        <Col md={6} className="d-flex justify-content-center">
           <FormGroup>
             {/* for some reason btn-primary does not work? */}
             <Button
@@ -136,7 +136,7 @@ function LoginForm(props) {
               color="primary"
               onClick={handleFacebookLogin}
             >
-              <FontAwesomeIcon icon={faFacebook} />
+              <FontAwesomeIcon icon={faFacebook} className="me-2" />
               Continue with Facebook
             </Button>
           </FormGroup>
