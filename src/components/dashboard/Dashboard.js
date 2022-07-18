@@ -1,15 +1,20 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Button } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
+import Nav from "components/nav/Nav";
+import CreateComboPlaylist from "components/playlists/CreateComboPlaylist";
+import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
+import { adminRefreshAllCombinedPlaylists, spotifyLogin } from "utils/utils";
+import { addSpotifyAuth, updateSpotifyAuth, _fetchUserFromDb } from "redux/user";
 import {
   _fetchAllCombinedPlaylistsFromDb,
   fetchSpotifyMe,
   fetchSpotifyPlaylists,
   fetchCombinedPlaylistsByUid,
 } from "redux/spotify";
-import Nav from "components/nav/Nav";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { addSpotifyAuth, updateSpotifyAuth, _fetchUserFromDb } from "redux/user";
-import CreateComboPlaylist from "components/playlists/CreateComboPlaylist";
 import {
   _addSongsToPlaylist,
   _deleteSongsFromPlaylist,
@@ -17,8 +22,6 @@ import {
   _getPlaylist,
   _getRefreshedAccessToken,
 } from "components/services/spotifyService";
-import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
-import { adminRefreshAllCombinedPlaylists, spotifyLogin } from "utils/utils";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -49,21 +52,26 @@ const Dashboard = (props) => {
     return diff;
   };
 
-  const handleSpotifyLogin = () => {
+  const handleConnectSpotify = () => {
     spotifyLogin();
   };
 
   useEffect(() => {
+    // if no userData, then return
     if (!userIsLoaded) return;
 
-    if (userIsLoaded && !userData.access_token && code && state) {
+    // trigger if spotify has been authorized (code & state comes from Spotify)
+    if (code && state) {
       dispatch(addSpotifyAuth({ uid: userData.uid, code, state, redirectURI }));
       navigate("/dashboard");
+      return;
     }
 
+    // Access token needs to be refreshed every 60mins, so check last time it was updated
     const lastUpdateInMins = getDifferenceInMins(new Date(userData.updatedAt), new Date());
 
-    if (userIsLoaded && userData.access_token && lastUpdateInMins > 60) {
+    // If updated over 60mins ago, then trigger a token refresh
+    if (userData.access_token && lastUpdateInMins > 60) {
       dispatch(
         updateSpotifyAuth({
           uid: userData.uid,
@@ -72,9 +80,12 @@ const Dashboard = (props) => {
         })
       );
       navigate("/dashboard");
+      return;
     }
 
-    if (userIsLoaded && userData.access_token) {
+    // This should be triggered if access token exists & has been alive for less than 60mins
+    // If true, then get Spotify details for user & fetch their Spotify playlists
+    if (userData.access_token) {
       dispatch(fetchSpotifyMe({ access_token: userData.access_token })).then((data) => {
         dispatch(
           fetchSpotifyPlaylists({
@@ -83,59 +94,39 @@ const Dashboard = (props) => {
           })
         );
 
+        // fetch their combined Playlists as well from DB
         dispatch(fetchCombinedPlaylistsByUid({ uid: userData.uid }));
       });
     }
   }, [userIsLoaded, userData]);
 
-  const handleSetAccessToken = async () => {
-    dispatch(createSpotifyAuth({ code, state, redirectURI }));
-  };
-
-  const handleRefreshAccessToken = async () => {
-    dispatch(
-      updateSpotifyAuth({
-        uid: userData.uid,
-        refresh_token: userData.refresh_token,
-        redirectURI,
-      })
-    );
-  };
-
-  const handleGetMe = async () => {
-    dispatch(fetchSpotifyMe({ access_token: userData.access_token }));
-  };
-
-  const handleGetPlaylists = async () => {
-    dispatch(
-      fetchSpotifyPlaylists({
-        user: spotifyData.user.id,
-        access_token: userData.access_token,
-      })
-    );
-  };
-
   return (
-    <div className="vh-100 vw-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5">
+    <div className="vw-100 min-vh-100 h-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5 text-text">
       <Nav />
       {!userIsLoaded && "User data loading..."}
       {userHasErrors && "Error Loading user data..."}
-      {userIsLoaded && (
+      {userIsLoaded && !userHasErrors && !userData.access_token && (
+        <div className="h-100 d-flex flex-column justify-content-center align-items-center">
+          <h1 className="text-text mb-3">Connect your Spotify Account to start</h1>
+          <div className="d-flex justify-content-center">
+            <Button
+              color="secondary"
+              className="btn-rounded d-flex gap-2 align-items-center fs-4 text-primary"
+              onClick={handleConnectSpotify}
+            >
+              <FontAwesomeIcon icon={faSpotify} />
+              Connect Spotify
+            </Button>
+          </div>
+        </div>
+      )}
+      {userIsLoaded && !userHasErrors && userData.access_token && (
         <div className="mt-5">
-          <CreateComboPlaylist />
+          {spotifyIsLoaded && spotifyData.playlists && <CreateComboPlaylist />}
 
-          {spotifyIsLoaded && (
+          {spotifyIsLoaded && spotifyData.combinedPlaylists && (
             <ListOfComboPlaylists combinedPlaylists={spotifyData.combinedPlaylists} />
           )}
-          <div>
-            <button onClick={handleSpotifyLogin}>Spotify Auth</button>
-            {!userData.access_token && (
-              <button onClick={handleSpotifyLogin}>Spotify Auth</button>
-            )}
-            {/* <button onClick={handleRefreshAccessToken}>Spotify Refresh Access Token</button>
-            <button onClick={handleGetMe}>Spotify Get Me</button>
-            <button onClick={handleGetPlaylists}>Spotify Get Playlists</button> */}
-          </div>
         </div>
       )}
     </div>
