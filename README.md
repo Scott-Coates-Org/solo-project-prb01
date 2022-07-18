@@ -42,11 +42,11 @@ App where user creates account and links their Spotify account. Then, adds playl
 
 ### Sprint 4
 
-- [ ] Technical component 100%
-- [ ] Combine playlist on creation
-- [ ] Show combined playlists
-- [ ] Ability to delete combined playlist
-- [ ] Layout & Styling
+- [x] Technical component 100%
+- [x] Combine playlist on creation
+- [x] Show combined playlists
+- [x] Ability to delete combined playlist
+- [x] Layout & Styling
 
 ## Mockups
 
