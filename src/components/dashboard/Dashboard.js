@@ -122,6 +122,7 @@ const Dashboard = (props) => {
       )}
       {userIsLoaded && !userHasErrors && userData.access_token && (
         <div className="mt-5">
+          {spotifyHasErrors && `Error Loading: ${spotifyErrorMsg}`}
           {spotifyIsLoaded && spotifyData.playlists && <CreateComboPlaylist />}
 
           {spotifyIsLoaded && spotifyData.combinedPlaylists && (
