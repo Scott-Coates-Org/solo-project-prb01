@@ -99,6 +99,7 @@ const CreateComboPlaylist = (props) => {
               <Input
                 id="name"
                 type="text"
+                placeholder="Combined playlist Name"
                 {...nameRest}
                 innerRef={nameRef}
                 invalid={errors.name ? true : false}
@@ -112,7 +113,7 @@ const CreateComboPlaylist = (props) => {
                   <Label for="playlist" sm={2}>
                     Playlist<span className="text-danger">*</span>
                   </Label>
-                  <Col sm={8}>
+                  <Col xs={10} sm={8}>
                     <Controller
                       name={`playlists.${idx}.playlist`}
                       control={control}
@@ -135,7 +136,7 @@ const CreateComboPlaylist = (props) => {
                       )}
                     />
                   </Col>
-                  <Col sm={2} className="d-flex align-items-center justify-content-start">
+                  <Col xs={2} sm={2} className="d-flex align-items-center justify-content-start">
                     <Button
                       outline
                       color="accent"
@@ -150,8 +151,8 @@ const CreateComboPlaylist = (props) => {
             ))}
           </ul>
           <Row>
-            <Col sm={10}></Col>
-            <Col sm={2} className="d-flex align-items-center justify-content-start">
+            <Col xs={10}></Col>
+            <Col xs={2} className="d-flex align-items-center justify-content-start">
               <Button outline onClick={() => append("")} className="rounded-circle fs-6">
                 <FontAwesomeIcon icon={faPlusCircle} />
               </Button>
