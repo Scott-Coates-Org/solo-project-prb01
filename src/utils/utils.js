@@ -157,13 +157,13 @@ export const refreshNewCombinedPlaylist = async (combo, access_token) => {
         tracksToAdd.splice(0, 100)
       );
 
-      if (addResponse.status !== 200) {
+      if (addResponse.status !== 201) {
         const errorMsg = await addResponse.text();
         throw { message: errorMsg };
       }
     }
     console.log(`DONE combining for ${combo.name}`);
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 };

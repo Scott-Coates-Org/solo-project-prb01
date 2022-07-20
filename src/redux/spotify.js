@@ -153,7 +153,7 @@ export const createCombinedPlaylist = createAsyncThunk(
         payload.name
       );
 
-      if (response.status !== 200) {
+      if (response.status !== 201) {
         const errorMsg = await response.text();
         throw { message: errorMsg };
       }
