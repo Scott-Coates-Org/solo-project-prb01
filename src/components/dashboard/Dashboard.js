@@ -26,6 +26,7 @@ import {
   _getPlaylist,
   _getRefreshedAccessToken,
 } from "components/services/spotifyService";
+import RefreshOverlay from "./RefreshOverlay";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ const Dashboard = (props) => {
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const [timeoutId, setTimeoutId] = useState();
+  const [refreshRequired, setRefreshRequired] = useState(false);
   const {
     data: userData,
     isLoaded: userIsLoaded,
@@ -78,26 +80,20 @@ const Dashboard = (props) => {
           redirectURI,
         })
       );
+      setRefreshRequired(false);
       navigate("/dashboard");
       return;
     }
 
-    // if updated less than 60mins ago, put in a setTimeout call to refresh when it hits 60mins
+    // if updated less than 60mins ago, put in a setTimeout call to ask user to refresh token
     if (userData.access_token && lastUpdateInMins < 60) {
       if (timeoutId) clearTimeout(timeoutId);
 
       const timeToWaitInMs = (60 - lastUpdateInMins) * 60 * 1000;
 
       const id = setTimeout(() => {
-        dispatch(
-          updateSpotifyAuth({
-            uid: userData.uid,
-            refresh_token: userData.refresh_token,
-            redirectURI,
-          })
-        );
+        setRefreshRequired(true);
         setTimeoutId();
-        navigate("/dashboard");
         return;
       }, timeToWaitInMs);
 
@@ -121,6 +117,18 @@ const Dashboard = (props) => {
     }
   }, [userIsLoaded, userData]);
 
+  const handleRefreshToken = () => {
+    dispatch(
+      updateSpotifyAuth({
+        uid: userData.uid,
+        refresh_token: userData.refresh_token,
+        redirectURI,
+      })
+    );
+    setRefreshRequired(false);
+    navigate("/dashboard");
+  };
+
   return (
     <div className="vw-100 min-vh-100 h-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5 text-text">
       <Nav />
@@ -142,14 +150,17 @@ const Dashboard = (props) => {
         </div>
       )}
       {userIsLoaded && !userHasErrors && userData.access_token && (
-        <div className="mt-5">
-          {spotifyHasErrors && `Error Loading: ${spotifyErrorMsg}`}
-          {spotifyIsLoaded && spotifyData.playlists && <CreateComboPlaylist />}
+        <>
+          {refreshRequired && <RefreshOverlay handleRefreshToken={handleRefreshToken} />}
+          <div className="mt-5">
+            {spotifyHasErrors && `Error Loading: ${spotifyErrorMsg}`}
+            {spotifyIsLoaded && spotifyData.playlists && <CreateComboPlaylist />}
 
-          {spotifyIsLoaded && spotifyData.combinedPlaylists && (
-            <ListOfComboPlaylists combinedPlaylists={spotifyData.combinedPlaylists} />
-          )}
-        </div>
+            {spotifyIsLoaded && spotifyData.combinedPlaylists && (
+              <ListOfComboPlaylists combinedPlaylists={spotifyData.combinedPlaylists} />
+            )}
+          </div>
+        </>
       )}
     </div>
   );

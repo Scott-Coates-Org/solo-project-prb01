@@ -8,6 +8,25 @@
   background-attachment: fixed;
 }
 
+.overlay-bg {
+  z-index: 999;
+}
+
+.overlay-bg:after {
+  content: "";
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: var(--bs-primary);
+  opacity: 0.8;
+}
+
+.overlay-msg {
+  z-index: 9999;
+}
+
 .text-shadow {
   text-shadow:
       -1px -1px 5px var(--bs-primary),
