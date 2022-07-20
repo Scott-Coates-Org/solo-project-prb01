@@ -88,9 +88,9 @@ const CreateComboPlaylist = (props) => {
       {spotifyIsLoaded && (
         <Form
           onSubmit={handleSubmit(onSubmit)}
-          className="p-3 my-3 border border-accent form-rounded text-text"
+          className="p-3 my-3 border border-secondary form-rounded text-text"
         >
-          <h2 className="text-center mb-4">New Combined Playlist</h2>
+          <h2 className="text-center mb-4">Create new combined playlist</h2>
           <FormGroup row>
             <Label for="name" sm={2}>
               Name<span className="text-danger">*</span>
