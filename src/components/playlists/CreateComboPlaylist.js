@@ -84,7 +84,7 @@ const CreateComboPlaylist = (props) => {
   return (
     <>
       {!spotifyIsLoaded && "Form loading..."}
-      {spotifyHasErrors && "Error Loading"}
+      {spotifyHasErrors && `Error Loading: ${spotifyErrorMsg}`}
       {spotifyIsLoaded && (
         <Form
           onSubmit={handleSubmit(onSubmit)}
