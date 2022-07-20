@@ -7,7 +7,7 @@ import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 import Nav from "components/nav/Nav";
 import CreateComboPlaylist from "components/playlists/CreateComboPlaylist";
 import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
-import { adminRefreshAllCombinedPlaylists, spotifyLogin } from "utils/utils";
+import { adminRefreshAllCombinedPlaylists, getDifferenceInMins, spotifyLogin } from "utils/utils";
 import { addSpotifyAuth, updateSpotifyAuth, _fetchUserFromDb } from "redux/user";
 import {
   _fetchAllCombinedPlaylistsFromDb,
@@ -45,12 +45,6 @@ const Dashboard = (props) => {
     hasErrors: spotifyHasErrors,
     errorMsg: spotifyErrorMsg,
   } = useSelector((state) => state.spotify);
-
-  const getDifferenceInMins = (fromDate, toDate) => {
-    const diff = Math.floor((toDate - fromDate) / (1000 * 60));
-    console.log(diff);
-    return diff;
-  };
 
   const handleConnectSpotify = () => {
     spotifyLogin();

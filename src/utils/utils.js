@@ -15,6 +15,12 @@ const baseURI = "https://accounts.spotify.com";
 const redirectURI = `${window.location.origin}/dashboard`;
 
 // UTILS
+export const getDifferenceInMins = (fromDate, toDate) => {
+  const diff = Math.floor((toDate - fromDate) / (1000 * 60));
+  console.log(diff);
+  return diff;
+};
+
 export const spotifyLogin = () => {
   try {
     const scope = [
