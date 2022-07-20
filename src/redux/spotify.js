@@ -112,8 +112,8 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
           throw { message: errorMsg };
         }
 
-        const data = await response.json()
-        playlists.push(...data.items);
+        response = await response.json()
+        playlists.push(...response.items);
       }
 
       const sortedPlaylists = playlists.sort(
