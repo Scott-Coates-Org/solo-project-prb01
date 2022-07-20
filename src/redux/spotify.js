@@ -80,7 +80,7 @@ export const fetchSpotifyMe = createAsyncThunk(
       return response.id;
     } catch (error) {
       console.log(error);
-      thunkAPI.dispatch(appendDataFailure(error));
+      thunkAPI.dispatch(appendDataFailure(error.message));
     }
   }
 );
@@ -103,7 +103,7 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
       );
       thunkAPI.dispatch(appendDataSuccess({ playlists: sortedPlaylists }));
     } catch (error) {
-      thunkAPI.dispatch(appendDataFailure(error));
+      thunkAPI.dispatch(appendDataFailure(error.message));
     }
   }
 );
@@ -120,7 +120,7 @@ export const fetchCombinedPlaylistsByUid = createAsyncThunk(
 
       return data;
     } catch (error) {
-      thunkAPI.dispatch(appendDataFailure(error));
+      thunkAPI.dispatch(appendDataFailure(error.message));
     }
   }
 );
