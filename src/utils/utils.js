@@ -107,7 +107,7 @@ export const adminRefreshAllCombinedPlaylists = async () => {
           tracksToAdd.splice(0, 100)
         );
 
-        if (addResponse.status !== 200) {
+        if (addResponse.status !== 201) {
           const errorMsg = await addResponse.text();
           throw { message: errorMsg };
         }
