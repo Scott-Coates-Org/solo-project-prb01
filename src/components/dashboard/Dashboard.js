@@ -152,7 +152,7 @@ const Dashboard = (props) => {
       {userIsLoaded && !userHasErrors && userData.access_token && (
         <>
           {refreshRequired && <RefreshOverlay handleRefreshToken={handleRefreshToken} />}
-          <div className="mt-5">
+          <div>
             {spotifyHasErrors && `Error Loading: ${spotifyErrorMsg}`}
             {spotifyIsLoaded && spotifyData.playlists && <CreateComboPlaylist />}
 

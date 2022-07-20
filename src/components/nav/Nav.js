@@ -1,12 +1,28 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 import { useSelector } from "react-redux";
-import { Nav as StrapNav, NavItem, NavLink, Button } from "reactstrap";
+import {
+  Nav as StrapNav,
+  NavItem,
+  NavLink,
+  Button,
+  Navbar,
+  Collapse,
+  NavbarToggler,
+  NavbarBrand,
+} from "reactstrap";
 import { adminRefreshAllCombinedPlaylists, spotifyLogin } from "utils/utils";
 import logoSmall from "../../assets/img/spotlist.svg";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Nav = () => {
-  const userData = useSelector(state => state.user.data)
+  const userData = useSelector((state) => state.user.data);
+  const [collapsed, setCollapsed] = useState(true);
+  const navigate = useNavigate()
+
+  // toggle burger menu on mobile
+  const toggleNavbar = () => setCollapsed(!collapsed);
 
   // admin function to synch all combined playlists
   const handleRefreshCombinedPlaylists = async () => {
@@ -15,50 +31,51 @@ const Nav = () => {
 
   //(re)Connect to Spotify (auth)
   const handleConnectSpotify = () => {
-    spotifyLogin()
-  }
+    spotifyLogin();
+  };
 
   return (
-    <header className="fixed-top d-flex justify-content-center align-items-center p-2 px-3">
-      <div
-        style={{ maxWidth: "1360px" }}
-        className="d-flex justify-content-between align-items-center w-100"
-      >
-        <div>
-          <a href="/">
-            <img src={logoSmall} alt="SpotLislogo" width="75px" height="75px" />
-          </a>
-        </div>
-
-        <StrapNav pills>
-          {userData.admin && (
-            <NavItem className="me-2">
+    <header className="mb-6">
+      <Navbar className="align-items-center w-100" dark fixed="top" container="sm" expand="sm">
+        <NavbarBrand href="/" className="me-auto">
+          <img src={logoSmall} alt="SpotLislogo" width="75px" height="75px" />
+        </NavbarBrand>
+        <NavbarToggler onClick={toggleNavbar} className="me-2" />
+        <Collapse isOpen={!collapsed} navbar>
+          <StrapNav pills navbar className="pt-4 pb-4 px-3 ms-auto gap-3">
+            {userData.admin && (
+              <NavItem className="">
+                <Button
+                  color="secondary"
+                  className="btn-rounded container-sm py-4 py-sm-2"
+                  onClick={handleRefreshCombinedPlaylists}
+                >
+                  Refresh All Playlists
+                </Button>
+              </NavItem>
+            )}
+            <NavItem className="">
               <Button
                 color="secondary"
-                className="btn-rounded"
-                onClick={handleRefreshCombinedPlaylists}
+                className="btn-rounded d-flex gap-2 justify-content-center align-items-center container-sm py-4 py-sm-2"
+                onClick={handleConnectSpotify}
               >
-                Refresh All Playlists
+                <FontAwesomeIcon icon={faSpotify} />
+                (re)Connect Spotify
               </Button>
             </NavItem>
-          )}
-          <NavItem className="me-2">
-            <Button
-              color="secondary"
-              className="btn-rounded d-flex gap-2 align-items-center"
-              onClick={handleConnectSpotify}
-            >
-              <FontAwesomeIcon icon={faSpotify} />
-              (re)Connect Spotify
-            </Button>
-          </NavItem>
-          <NavItem className="bg-accent btn-rounded">
-            <NavLink href="/logout">
-              <b>Logout</b>
-            </NavLink>
-          </NavItem>
-        </StrapNav>
-      </div>
+            <NavItem className="">
+              <Button
+                color="accent"
+                className="btn-rounded text-center px-4 container-sm py-4 py-sm-2"
+                onClick={() => navigate("/logout")}
+              >
+                Logout
+              </Button>
+            </NavItem>
+          </StrapNav>
+        </Collapse>
+      </Navbar>
     </header>
   );
 };
