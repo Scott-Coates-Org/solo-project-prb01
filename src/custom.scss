@@ -7,7 +7,8 @@ $secondary: #4ABDAC;
 
 $custom-colors: (
   "accent": #ff6542,
-  "text": #f8eddd
+  "text": #f8eddd,
+  "alt": #f5b800
   );
 $theme-colors: map-merge($theme-colors, $custom-colors);
   
