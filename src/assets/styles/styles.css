@@ -8,6 +8,19 @@
   background-attachment: fixed;
 }
 
+.navbar {
+  height: 85px;
+  max-height: 85px;
+}
+
+.navbar.scroll {
+  height: 65px;
+  max-height: 65px;
+  background-color: var(--bs-primary);
+  box-shadow: -1px 10px 20px 1px rgba(43, 48, 58, 0.75);
+  /* box-shadow: -1px 10px 20px 1px rgba(74,189,172, 0.75); */
+}
+
 .overlay-bg {
   z-index: 999;
 }
