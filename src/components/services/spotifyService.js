@@ -53,7 +53,7 @@ export async function _getMe(access_token) {
     },
   });
 
-  return response.json();
+  return response;
 }
 
 export async function _getPlaylists(user, access_token, uri = null) {
@@ -70,7 +70,7 @@ export async function _getPlaylists(user, access_token, uri = null) {
     opts
   );
 
-  return response.json();
+  return response;
 }
 
 export async function _getPlaylist(playlist_id, access_token) {
@@ -170,7 +170,7 @@ export async function _createPlaylist(user_id, access_token, name, description =
 
   const response = await fetch(`${apiURI}/users/${user_id}/playlists`, opts);
 
-  return response.json();
+  return response;
 }
 
 //API call to add tracks to a playlist

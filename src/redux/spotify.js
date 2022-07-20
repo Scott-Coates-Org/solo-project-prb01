@@ -76,10 +76,16 @@ export const fetchSpotifyMe = createAsyncThunk(
     try {
       thunkAPI.dispatch(appendData());
       const response = await _getMe(payload.access_token);
-      thunkAPI.dispatch(appendDataSuccess({ user: response }));
-      return response.id;
+
+      if (response.status !== 200) {
+        const errorMsg = await response.text();
+        throw { message: errorMsg };
+      }
+
+      const data = await response.json();
+      thunkAPI.dispatch(appendDataSuccess({ user: data }));
+      return data.id;
     } catch (error) {
-      console.log(error);
       thunkAPI.dispatch(appendDataFailure(error.message));
     }
   }
@@ -90,14 +96,26 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       thunkAPI.dispatch(appendData());
+
       const playlists = [];
-      let response = await _getPlaylists(payload.user, payload.access_token);
-      playlists.push(...response.items);
+      let response = { next: "first" };
 
       while (response.next) {
-        response = await _getPlaylists(payload.user, payload.access_token, response.next);
-        playlists.push(...response.items);
+        response = await _getPlaylists(
+          payload.user,
+          payload.access_token,
+          response.next === "first" ? null : response.next
+        );
+
+        if (response.status !== 200) {
+          const errorMsg = await response.text();
+          throw { message: errorMsg };
+        }
+
+        const data = await response.json()
+        playlists.push(...data.items);
       }
+
       const sortedPlaylists = playlists.sort(
         (a, b) => a.name.toLowerCase() > b.name.toLowerCase()
       );
@@ -134,18 +152,19 @@ export const createCombinedPlaylist = createAsyncThunk(
         payload.access_token,
         payload.name
       );
-      await _createCombinedPlaylistInDb(
-        payload.uid,
-        payload.name,
-        response.id,
-        payload.playlists
-      );
 
-      return response.id;
+      if (response.status !== 200) {
+        const errorMsg = await response.text();
+        throw { message: errorMsg };
+      }
+
+      const data = await response.json()
+      await _createCombinedPlaylistInDb(payload.uid, payload.name, data.id, payload.playlists);
+
+      return data.id;
     } catch (error) {
-      console.log(error);
       thunkAPI.dispatch(createDataFailure(error.message));
-      return false
+      return false;
     }
   }
 );
@@ -155,10 +174,16 @@ export const deleteCombinedPlaylist = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await _unfollowPlaylist(payload.id, payload.access_token);
+
+      if (response.status !== 200) {
+        const errorMsg = await response.text();
+        throw { message: errorMsg };
+      }
+
       const snapshot = await _deleteCombinedPlaylistFromDb(payload.id);
       thunkAPI.dispatch(removeCombinedPlaylist(payload));
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   }
 );
