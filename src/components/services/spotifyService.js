@@ -111,8 +111,8 @@ export async function _getAllSongsFromPlaylist(playlist_id, access_token) {
       throw { message: errorMsg };
     }
 
-    const data = await response.json();
-    songs.push(...data.items);
+    response = await response.json();
+    songs.push(...response.items);
   }
 
   return songs;
