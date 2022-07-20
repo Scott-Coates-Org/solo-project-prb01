@@ -80,7 +80,7 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (payload, thun
       );
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     thunkAPI.dispatch(appendDataFailure(error.message));
   }
 });
@@ -114,11 +114,18 @@ export const addSpotifyAuth = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       const response = await _getAccessToken(payload.code, payload.state, payload.redirectURI);
+
+      if (response.status !== 200) {
+        const errorMsg = await response.text();
+        throw { message: errorMsg };
+      }
+
+      const data = await response.json();
       thunkAPI.dispatch(
         updateUserData({
           uid: payload.uid,
-          access_token: response.access_token,
-          refresh_token: response.refresh_token,
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
         })
       );
     } catch (error) {
@@ -135,12 +142,18 @@ export const updateSpotifyAuth = createAsyncThunk(
         payload.refresh_token,
         payload.redirectURI
       );
-      
+
+      if (response.status !== 200) {
+        const errorMsg = await response.text();
+        throw { message: errorMsg };
+      }
+
+      const data = await response.json()
       thunkAPI.dispatch(
         updateUserData({
           uid: payload.uid,
-          access_token: response.access_token,
-          refresh_token: response.refresh_token,
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
         })
       );
     } catch (error) {

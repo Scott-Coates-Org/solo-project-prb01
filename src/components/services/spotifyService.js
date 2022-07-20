@@ -23,7 +23,7 @@ export async function _getAccessToken(code, state, redirectURI) {
     body: formBody,
   });
 
-  return response.json();
+  return response;
 }
 
 export async function _getRefreshedAccessToken(refreshToken, redirectURI) {
@@ -41,7 +41,7 @@ export async function _getRefreshedAccessToken(refreshToken, redirectURI) {
     body: formBody,
   });
 
-  return response.json();
+  return response;
 }
 
 export async function _getMe(access_token) {
