@@ -9,7 +9,7 @@ const ListOfComboPlaylists = ({ combinedPlaylists }) => {
     hasErrors: spotifyHasErrors,
   } = useSelector((state) => state.spotify);
 
-  if (!combinedPlaylists) return null;
+  if (!combinedPlaylists || combinedPlaylists.length === 0) return null;
 
   return (
     <>
