@@ -7,6 +7,7 @@ const ListOfComboPlaylists = ({ combinedPlaylists }) => {
     data: spotifyData,
     isLoaded: spotifyIsLoaded,
     hasErrors: spotifyHasErrors,
+    errorMsg: spotifyErrorMsg
   } = useSelector((state) => state.spotify);
 
   if (!combinedPlaylists || combinedPlaylists.length === 0) return null;
@@ -14,7 +15,7 @@ const ListOfComboPlaylists = ({ combinedPlaylists }) => {
   return (
     <>
       {!spotifyIsLoaded && "Form loading..."}
-      {spotifyHasErrors && "Error Loading"}
+      {spotifyHasErrors && `Error Loading: ${spotifyErrorMsg}`}
       {spotifyIsLoaded && (
         <Container className="p-3 my-3 border border-accent form-rounded text-text d-grid gap-3">
           <h2 className="text-center mb-4">{spotifyData.user?.id}'s Combined Playlists</h2>
