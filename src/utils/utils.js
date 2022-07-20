@@ -45,7 +45,7 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       console.log(`REFRESHING ${combo.name} for ${user.uid}`);
 
       // refresh token
-      userResponse = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
+      const userResponse = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
 
       if (userResponse.status !== 200) {
         const errorMsg = await userResponse.text();
