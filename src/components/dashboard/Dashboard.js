@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "reactstrap";
@@ -7,7 +7,11 @@ import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 import Nav from "components/nav/Nav";
 import CreateComboPlaylist from "components/playlists/CreateComboPlaylist";
 import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
-import { adminRefreshAllCombinedPlaylists, getDifferenceInMins, spotifyLogin } from "utils/utils";
+import {
+  adminRefreshAllCombinedPlaylists,
+  getDifferenceInMins,
+  spotifyLogin,
+} from "utils/utils";
 import { addSpotifyAuth, updateSpotifyAuth, _fetchUserFromDb } from "redux/user";
 import {
   _fetchAllCombinedPlaylistsFromDb,
@@ -33,6 +37,7 @@ const Dashboard = (props) => {
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
   const state = searchParams.get("state");
+  const [timeoutId, setTimeoutId] = useState();
   const {
     data: userData,
     isLoaded: userIsLoaded,
@@ -75,6 +80,28 @@ const Dashboard = (props) => {
       );
       navigate("/dashboard");
       return;
+    }
+
+    // if updated less than 60mins ago, put in a setTimeout call to refresh when it hits 60mins
+    if (userData.access_token && lastUpdateInMins < 60) {
+      if (timeoutId) clearTimeout(timeoutId);
+
+      const timeToWaitInMs = (60 - lastUpdateInMins) * 60 * 1000;
+
+      const id = setTimeout(() => {
+        dispatch(
+          updateSpotifyAuth({
+            uid: userData.uid,
+            refresh_token: userData.refresh_token,
+            redirectURI,
+          })
+        );
+        setTimeoutId();
+        navigate("/dashboard");
+        return;
+      }, timeToWaitInMs);
+
+      setTimeoutId(id);
     }
 
     // This should be triggered if access token exists & has been alive for less than 60mins
