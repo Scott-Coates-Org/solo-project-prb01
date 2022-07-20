@@ -81,7 +81,7 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (payload, thun
     }
   } catch (error) {
     console.log(error)
-    thunkAPI.dispatch(appendDataFailure(error));
+    thunkAPI.dispatch(appendDataFailure(error.message));
   }
 });
 
@@ -92,7 +92,7 @@ export const createUserData = createAsyncThunk(
       await _createUserData(payload.uid);
       thunkAPI.dispatch(fetchUser(payload));
     } catch (error) {
-      thunkAPI.dispatch(createDataFailure(error));
+      thunkAPI.dispatch(createDataFailure(error.message));
     }
   }
 );
@@ -104,7 +104,7 @@ export const updateUserData = createAsyncThunk(
       await _updateUserData(payload.uid, payload.access_token, payload.refresh_token);
       thunkAPI.dispatch(fetchUser(payload));
     } catch (error) {
-      thunkAPI.dispatch(createDataFailure(error));
+      thunkAPI.dispatch(createDataFailure(error.message));
     }
   }
 );
@@ -122,7 +122,7 @@ export const addSpotifyAuth = createAsyncThunk(
         })
       );
     } catch (error) {
-      thunkAPI.dispatch(createDataFailure(error));
+      thunkAPI.dispatch(createDataFailure(error.message));
     }
   }
 );
@@ -144,7 +144,7 @@ export const updateSpotifyAuth = createAsyncThunk(
         })
       );
     } catch (error) {
-      thunkAPI.dispatch(createDataFailure(error));
+      thunkAPI.dispatch(createDataFailure(error.message));
     }
   }
 );
