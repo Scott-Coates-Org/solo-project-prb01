@@ -37,6 +37,8 @@ export const adminRefreshAllCombinedPlaylists = async () => {
     // fetch all combined playlists
     const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
 
+    console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
+
     // loop through combined playlists
     for (const combo of combinedPlaylists) {
       // pull user info
@@ -114,6 +116,8 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       }
       console.log(`DONE combining for ${combo.name}`);
     }
+
+    console.log(`COMPLETED REFRESH FOR ${combinedPlaylists.length} combos`);
   } catch (error) {
     alert(error.message);
   }
