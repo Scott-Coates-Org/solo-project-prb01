@@ -82,22 +82,37 @@ export async function _getPlaylist(playlist_id, access_token) {
     },
   };
 
-  const response = await fetch(
-    `${apiURI}/playlists/${playlist_id}`,
-    opts
-  );
+  const response = await fetch(`${apiURI}/playlists/${playlist_id}`, opts);
 
-  return response.json();
+  return response;
 }
 
 export async function _getAllSongsFromPlaylist(playlist_id, access_token) {
   const songs = [];
-  let response = await _getSongsFromPlaylist(playlist_id, access_token);
-  songs.push(...response.items);
+  // let response = await _getSongsFromPlaylist(playlist_id, access_token);
+  // songs.push(...response.items);
+
+  // while (response.next) {
+  //   response = await _getSongsFromPlaylist(playlist_id, access_token, response.next);
+  //   songs.push(...response.items);
+  // }
+
+  let response = { next: "first" };
 
   while (response.next) {
-    response = await _getSongsFromPlaylist(playlist_id, access_token, response.next);
-    songs.push(...response.items);
+    response = await _getSongsFromPlaylist(
+      playlist_id,
+      access_token,
+      response.next === "first" ? null : response.next
+    );
+
+    if (response.status !== 200) {
+      const errorMsg = await response.text();
+      throw { message: errorMsg };
+    }
+
+    const data = await response.json();
+    songs.push(...data.items);
   }
 
   return songs;
@@ -117,7 +132,7 @@ async function _getSongsFromPlaylist(playlist_id, access_token, uri = null) {
     opts
   );
 
-  return response.json();
+  return response;
 }
 
 //API call to delete songs from playlist
@@ -135,7 +150,7 @@ export async function _deleteSongsFromPlaylist(playlist_id, access_token, tracks
 
   const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
 
-  return response.json();
+  return response;
 }
 
 export async function _unfollowPlaylist(playlist_id, access_token) {
@@ -153,11 +168,16 @@ export async function _unfollowPlaylist(playlist_id, access_token) {
 }
 
 //API call to create a new playlist for a specific user id
-export async function _createPlaylist(user_id, access_token, name, description = "Combined playlist") {
+export async function _createPlaylist(
+  user_id,
+  access_token,
+  name,
+  description = "Combined playlist"
+) {
   const data = {
     name,
-    description
-  }
+    description,
+  };
 
   const opts = {
     method: "POST",
@@ -178,8 +198,8 @@ export async function _createPlaylist(user_id, access_token, name, description =
 //Tracks are an array of spotify track uris {"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M",
 export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
   const data = {
-    uris
-  }
+    uris,
+  };
 
   const opts = {
     method: "POST",
@@ -192,5 +212,5 @@ export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
 
   const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
 
-  return response.json();
+  return response;
 }

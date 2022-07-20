@@ -45,10 +45,24 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       console.log(`REFRESHING ${combo.name} for ${user.uid}`);
 
       // refresh token
-      user = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
+      userResponse = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
+
+      if (userResponse.status !== 200) {
+        const errorMsg = await userResponse.text();
+        throw { message: errorMsg };
+      }
+
+      user = await userResponse.json();
 
       //   check playlist still exists, else next
-      const playlistExists = await _getPlaylist(combo.id, user.access_token);
+      const playlistResponse = await _getPlaylist(combo.id, user.access_token);
+
+      if (playlistResponse.status !== 200) {
+        const errorMsg = await playlistResponse.text();
+        throw { message: errorMsg };
+      }
+
+      const playlistExists = await playlistResponse.json();
       if (!playlistExists) continue;
 
       // get all songs in combined playlist
@@ -60,9 +74,14 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       // remove all songs in combined playlist
       console.log(`REMOVING ${tracksURI.length} tracks in CombinedPlaylist`);
       while (tracksURI.length > 0) {
-        await _deleteSongsFromPlaylist(combo.id, user.access_token, {
+        const deleteResponse = await _deleteSongsFromPlaylist(combo.id, user.access_token, {
           tracks: tracksURI.splice(0, 100),
         });
+
+        if (deleteResponse.status !== 200) {
+          const errorMsg = await deleteResponse.text();
+          throw { message: errorMsg };
+        }
       }
 
       // loop through playlists
@@ -82,11 +101,16 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       // add all songs to combined playlist
       console.log(`ADDING ${tracksToAdd.length} tracks to Combined Playlist`);
       while (tracksToAdd.length > 0) {
-        const response = await _addSongsToPlaylist(
+        const addResponse = await _addSongsToPlaylist(
           combo.id,
           user.access_token,
           tracksToAdd.splice(0, 100)
         );
+
+        if (addResponse.status !== 200) {
+          const errorMsg = await addResponse.text();
+          throw { message: errorMsg };
+        }
       }
       console.log(`DONE combining for ${combo.name}`);
     }
@@ -98,7 +122,14 @@ export const adminRefreshAllCombinedPlaylists = async () => {
 export const refreshNewCombinedPlaylist = async (combo, access_token) => {
   try {
     //   check playlist still exists, else return
-    const playlistExists = await _getPlaylist(combo.id, access_token);
+    const playlistResponse = await _getPlaylist(combo.id, access_token);
+
+    if (playlistResponse.status !== 200) {
+      const errorMsg = await playlistResponse.text();
+      throw { message: errorMsg };
+    }
+
+    const playlistExists = await playlistResponse.json();
     if (!playlistExists) throw "Combined playlist does not exist";
 
     // loop through playlists
@@ -116,11 +147,16 @@ export const refreshNewCombinedPlaylist = async (combo, access_token) => {
     // add all songs to combined playlist
     console.log(`ADDING ${tracksToAdd.length} tracks to Combined Playlist`);
     while (tracksToAdd.length > 0) {
-      const response = await _addSongsToPlaylist(
+      const addResponse = await _addSongsToPlaylist(
         combo.id,
         access_token,
         tracksToAdd.splice(0, 100)
       );
+
+      if (addResponse.status !== 200) {
+        const errorMsg = await addResponse.text();
+        throw { message: errorMsg };
+      }
     }
     console.log(`DONE combining for ${combo.name}`);
   } catch (error) {
