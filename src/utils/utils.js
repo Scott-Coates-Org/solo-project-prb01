@@ -101,7 +101,7 @@ export const adminRefreshAllCombinedPlaylists = async () => {
           ...tracks.filter((track) => !track.track.is_local).map((track) => track.track.uri)
         );
 
-        console.log(`BUFFERING ${tracks.length} from ${playlist.name}`);
+        console.log(`BUFFERING ${tracksToAdd.length} from ${playlist.name}`);
       }
 
       // remove duplicates?
