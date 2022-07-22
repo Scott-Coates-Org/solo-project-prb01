@@ -97,11 +97,12 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       for (const playlist of combo.playlists) {
         // get all songs from playlist, add to array
         const tracks = await _getAllSongsFromPlaylist(playlist.id, user.access_token);
+        const tracksNotLocal = tracks.filter((track) => !track.track.is_local).map((track) => track.track.uri)
         tracksToAdd.push(
-          ...tracks.filter((track) => !track.track.is_local).map((track) => track.track.uri)
+          ...tracksNotLocal
         );
 
-        console.log(`BUFFERING ${tracksToAdd.length} from ${playlist.name}`);
+        console.log(`BUFFERING ${tracksNotLocal.length} from ${playlist.name}`);
       }
 
       // remove duplicates?
