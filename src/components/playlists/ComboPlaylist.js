@@ -34,7 +34,7 @@ const ComboPlaylist = ({ combinedPlaylist, idx }) => {
           <h5>{combinedPlaylist.name}</h5>
         </AccordionHeader>
         <AccordionBody accordionId={idx}>
-          <Row>
+          <Row className="gy-4">
             <Col sm={10}>
               {combinedPlaylist.playlists.map((playlist, playlistIdx) => (
                 <Playlist key={playlist.id} playlist={playlist} idx={playlistIdx} />
