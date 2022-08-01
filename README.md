@@ -5,7 +5,7 @@
 
 Have you ever wanted to be able to add songs to customize a public playlist in Spotify? Of course you can just clone a public playlist, but what happens if they update it? Are you going to check those playlists every day just to make sure your playlists are in synch? Well, fret no more because the solution is here: SpotList - your friendly Spotify Playlist Combiner with automatic synch.
 
-[Live link to SpotList](https://spotifyprb01.firebaseapp.com/dashboard)
+[Live link to SpotList](https://spotlist.prb01.com)
 
 ## Final Deliverable (v1)
 
