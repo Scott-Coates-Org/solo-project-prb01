@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap');
+
+body {
+  font-family: "Roboto", Verdana, Tahoma, sans-serif;
+}
 
 .homepage-bg {
   background-image: url('../img/homepage-bg.webp');
