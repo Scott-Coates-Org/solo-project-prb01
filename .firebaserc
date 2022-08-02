@@ -1,6 +1,7 @@
 {
   "projects": {
-    "spotify": "spotifyprb01"
+    "spotify": "spotifyprb01",
+    "default": "spotifyprb01"
   },
   "targets": {}
 }
