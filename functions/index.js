@@ -20,10 +20,9 @@ const checkUserLoggedIn = (context) => {
 };
 
 exports.getAccessToken = functions.https.onCall(async (data, context) => {
-  console.log({ data, context });
   const { code, state, redirectURI } = data;
 
-  // checkUserLoggedIn(context);
+  checkUserLoggedIn(context);
 
   if (state !== spotifyState) {
     throw new functions.https.HttpsError("invalid-argument", "States are not the same");
@@ -33,15 +32,6 @@ exports.getAccessToken = functions.https.onCall(async (data, context) => {
   formBody.set("grant_type", "authorization_code");
   formBody.set("code", code);
   formBody.set("redirect_uri", redirectURI);
-
-  // const response = await fetch(`${baseURI}/api/token`, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/x-www-form-urlencoded",
-  //     Authorization: "Basic " + new Buffer(clientId + ":" + clientSecret).toString("base64"),
-  //   },
-  //   body: formBody,
-  // });
 
   try {
     const response = await axios({

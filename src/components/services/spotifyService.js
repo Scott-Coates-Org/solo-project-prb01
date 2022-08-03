@@ -1,29 +1,17 @@
+import firebase from "firebase/app";
+require("firebase/functions");
+firebase.functions().useEmulator("localhost", 5001);
+
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
 const spotifyState = process.env.REACT_APP_SPOTIFY_STATE;
 const baseURI = "https://accounts.spotify.com";
 const apiURI = "https://api.spotify.com/v1";
 
-export async function _getAccessToken(code, state, redirectURI) {
-  if (state !== spotifyState) {
-    return console.log("States are not the same");
-  }
-
-  const formBody = new URLSearchParams();
-  formBody.set("grant_type", "authorization_code");
-  formBody.set("code", code);
-  formBody.set("redirect_uri", redirectURI);
-
-  const response = await fetch(`${baseURI}/api/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + new Buffer(clientId + ":" + clientSecret).toString("base64"),
-    },
-    body: formBody,
-  });
-
-  return response;
+async function getAccessToken(code, state, redirectURI) {
+  const _getAccessToken = firebase.functions().httpsCallable("getAccessToken");
+  const { data } = await _getAccessToken({ code, state, redirectURI });
+  return data;
 }
 
 export async function _getRefreshedAccessToken(refreshToken, redirectURI) {
@@ -214,3 +202,5 @@ export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
 
   return response;
 }
+
+export const spotifyService = { getAccessToken };

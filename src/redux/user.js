@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import firebaseClient from "firebase/client";
 import firebase from "firebase/app";
-import { _getAccessToken, _getRefreshedAccessToken } from "components/services/spotifyService";
+import { spotifyService } from "components/services/spotifyService";
+import { _getRefreshedAccessToken } from "components/services/spotifyService";
 
 const initialState = {
   data: {},
@@ -113,14 +114,13 @@ export const addSpotifyAuth = createAsyncThunk(
   "user/addSpotifyAuth",
   async (payload, thunkAPI) => {
     try {
-      const response = await _getAccessToken(payload.code, payload.state, payload.redirectURI);
+      const data = await spotifyService.getAccessToken(
+        payload.code,
+        payload.state,
+        payload.redirectURI
+      );
+      // const { data } = await _getAccessToken(payload);
 
-      if (response.status !== 200) {
-        const errorMsg = await response.text();
-        throw { message: errorMsg };
-      }
-
-      const data = await response.json();
       thunkAPI.dispatch(
         updateUserData({
           uid: payload.uid,
@@ -148,7 +148,7 @@ export const updateSpotifyAuth = createAsyncThunk(
         throw { message: errorMsg };
       }
 
-      const data = await response.json()
+      const data = await response.json();
       thunkAPI.dispatch(
         updateUserData({
           uid: payload.uid,
