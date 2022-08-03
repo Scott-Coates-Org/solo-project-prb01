@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "node": "^14.18.0"
+    "node": "16"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
