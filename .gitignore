@@ -25,6 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 ui-debug.log*
 firebase-debug.log*
+.log
 
 # hosting
 .firebase
