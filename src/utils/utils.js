@@ -1,7 +1,7 @@
 import { _fetchAllCombinedPlaylistsFromDb } from "redux/spotify";
 import { _fetchUserFromDb } from "redux/user";
+import { spotifyService } from "components/services/spotifyService";
 import {
-  _getRefreshedAccessToken,
   _getPlaylist,
   _getAllSongsFromPlaylist,
   _deleteSongsFromPlaylist,
@@ -53,7 +53,7 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       console.log(`REFRESHING ${combo.name} for ${user.uid}`);
 
       // refresh token
-      const userResponse = await _getRefreshedAccessToken(user.refresh_token, redirectURI);
+      const userResponse = await spotifyService.getRefreshedAccessToken(user.refresh_token, redirectURI);
 
       if (userResponse.status !== 200) {
         const errorMsg = await userResponse.text();
