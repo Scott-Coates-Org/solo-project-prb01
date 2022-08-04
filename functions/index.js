@@ -59,3 +59,40 @@ exports.getAccessToken = functions.https.onCall(async (data, context) => {
     }
   }
 });
+
+exports.getRefreshedAccessToken = functions.https.onCall(async (data, context) => {
+  const { refreshToken, redirectURI } = data;
+
+  checkUserLoggedIn(context);
+
+  const formBody = new URLSearchParams();
+  formBody.set("grant_type", "refresh_token");
+  formBody.set("refresh_token", refreshToken);
+  formBody.set("redirect_uri", redirectURI);
+
+  try {
+    const response = await axios({
+      url: `${baseURI}/api/token`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization:
+          "Basic " + new Buffer.from(clientId + ":" + clientSecret).toString("base64"),
+      },
+      data: formBody,
+    });
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      // The request was made and the server responded with a non 2.x.x status
+      throw new functions.https.HttpsError("unknown", error.message);
+    } else if (error.request) {
+      // The request was made but no response was received
+      throw new functions.https.HttpsError("unavailable", "No response received.");
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log("Error", error.message);
+    }
+  }
+});
