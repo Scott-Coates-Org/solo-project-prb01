@@ -14,22 +14,12 @@ async function getAccessToken(code, state, redirectURI) {
   return data;
 }
 
-export async function _getRefreshedAccessToken(refreshToken, redirectURI) {
-  const formBody = new URLSearchParams();
-  formBody.set("grant_type", "refresh_token");
-  formBody.set("refresh_token", refreshToken);
-  formBody.set("redirect_uri", redirectURI);
-
-  const response = await fetch(`${baseURI}/api/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + new Buffer(clientId + ":" + clientSecret).toString("base64"),
-    },
-    body: formBody,
-  });
-
-  return response;
+async function getRefreshedAccessToken(refreshToken, redirectURI) {
+  const _getRefreshedAccessToken = firebase
+    .functions()
+    .httpsCallable("getRefreshedAccessToken");
+  const { data } = await _getRefreshedAccessToken({ refreshToken, redirectURI });
+  return data;
 }
 
 export async function _getMe(access_token) {
@@ -203,4 +193,4 @@ export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
   return response;
 }
 
-export const spotifyService = { getAccessToken };
+export const spotifyService = { getAccessToken, getRefreshedAccessToken };
