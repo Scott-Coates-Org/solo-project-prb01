@@ -53,25 +53,12 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       console.log(`REFRESHING ${combo.name} for ${user.uid}`);
 
       // refresh token
-      const userResponse = await spotifyService.getRefreshedAccessToken(user.refresh_token, redirectURI);
-
-      if (userResponse.status !== 200) {
-        const errorMsg = await userResponse.text();
-        throw { message: errorMsg };
-      }
-
-      user = await userResponse.json();
+      user = await spotifyService.getRefreshedAccessToken(user.refresh_token, redirectURI);
 
       //   check playlist still exists, else next
-      const playlistResponse = await _getPlaylist(combo.id, user.access_token);
-
-      if (playlistResponse.status !== 200) {
-        const errorMsg = await playlistResponse.text();
-        throw { message: errorMsg };
-      }
-
-      const playlistExists = await playlistResponse.json();
-      if (!playlistExists) continue;
+      const playlist = await spotifyService.getPlaylist(combo.id, user.access_token);
+      
+      if (!playlist) continue;
 
       // get all songs in combined playlist
       const tracks = await _getAllSongsFromPlaylist(combo.id, user.access_token);
