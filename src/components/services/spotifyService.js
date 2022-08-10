@@ -28,18 +28,6 @@ async function getMe(access_token) {
   return data;
 }
 
-export async function _getMe(access_token) {
-  const response = await fetch(`${apiURI}/me`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-  });
-
-  return response;
-}
-
 export async function _getPlaylists(user, access_token, uri = null) {
   const opts = {
     method: "GET",
