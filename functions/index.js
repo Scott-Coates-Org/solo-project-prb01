@@ -111,39 +111,22 @@ exports.getPlaylists = functions.https.onCall(async (data, context) => {
       Authorization: "Bearer " + access_token,
     },
   };
-  console.log({ uri });
 
   return spotifyAPICalls(context, opts);
 });
 
 exports.getPlaylist = functions.https.onCall(async (data, context) => {
   const { playlist_id, access_token } = data;
+  const opts = {
+    url: `${apiURI}/playlists/${playlist_id}`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+  };
 
-  checkUserLoggedIn(context);
-
-  try {
-    const response = await axios({
-      url: `${apiURI}/playlists/${playlist_id}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + access_token,
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      // The request was made and the server responded with a non 2.x.x status
-      throw new functions.https.HttpsError("unknown", error.message);
-    } else if (error.request) {
-      // The request was made but no response was received
-      throw new functions.https.HttpsError("unavailable", "No response received.");
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log("Error", error.message);
-    }
-  }
+  return spotifyAPICalls(context, opts);
 });
 
 // export async function _getPlaylists(user, access_token, uri = null) {
