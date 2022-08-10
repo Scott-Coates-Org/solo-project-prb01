@@ -108,7 +108,7 @@ exports.getMe = functions.https.onCall(async (data, context) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer" + access_token,
+        Authorization: "Bearer " + access_token,
       },
     });
 
