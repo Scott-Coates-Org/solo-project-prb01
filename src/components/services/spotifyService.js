@@ -22,6 +22,12 @@ async function getRefreshedAccessToken(refreshToken, redirectURI) {
   return data;
 }
 
+async function getMe(access_token) {
+  const _getMe = firebase.functions().httpsCallable("getMe");
+  const { data } = await _getMe({ access_token });
+  return data;
+}
+
 export async function _getMe(access_token) {
   const response = await fetch(`${apiURI}/me`, {
     method: "GET",
@@ -193,4 +199,4 @@ export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
   return response;
 }
 
-export const spotifyService = { getAccessToken, getRefreshedAccessToken };
+export const spotifyService = { getAccessToken, getRefreshedAccessToken, getMe };
