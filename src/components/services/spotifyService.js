@@ -34,22 +34,8 @@ async function getAllSongsFromPlaylist(playlist_id, access_token) {
   return spotifyAPICall("getAllSongsFromPlaylist", { playlist_id, access_token });
 }
 
-//API call to delete songs from playlist
-//Can only delete 100 at a time
-//Tracks are in array json format: {"tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" },{ "uri": "spotify:track:1301WleyT98MSxVHPZCA6M" }] }
-export async function _deleteSongsFromPlaylist(playlist_id, access_token, tracks) {
-  const opts = {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-    body: JSON.stringify(tracks),
-  };
-
-  const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
-
-  return response;
+async function deleteSongsFromPlaylist(playlist_id, access_token, tracks) {
+  return spotifyAPICall("deleteSongsFromPlaylist", { playlist_id, access_token, tracks });
 }
 
 export async function _unfollowPlaylist(playlist_id, access_token) {
@@ -121,4 +107,5 @@ export const spotifyService = {
   getAllPlaylists,
   getPlaylist,
   getAllSongsFromPlaylist,
+  deleteSongsFromPlaylist
 };
