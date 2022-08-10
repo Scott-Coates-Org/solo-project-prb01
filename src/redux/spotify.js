@@ -108,7 +108,7 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
           throw { message: errorMsg };
         }
 
-        response = await response.json()
+        response = await response.json();
         playlists.push(...response.items);
       }
 
@@ -154,7 +154,7 @@ export const createCombinedPlaylist = createAsyncThunk(
         throw { message: errorMsg };
       }
 
-      const data = await response.json()
+      const data = await response.json();
       await _createCombinedPlaylistInDb(payload.uid, payload.name, data.id, payload.playlists);
 
       return data.id;
