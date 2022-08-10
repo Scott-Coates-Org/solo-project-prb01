@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button } from "reactstrap";
+import { Button, Spinner } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 import Nav from "components/nav/Nav";
@@ -132,7 +132,11 @@ const Dashboard = (props) => {
   return (
     <div className="vw-100 min-vh-100 h-100 d-flex flex-column align-items-center homepage-bg p-2 pt-5 text-text">
       <Nav />
-      {!userIsLoaded && "User data loading..."}
+      {!userIsLoaded && (
+        <Spinner color="secondary" className="position-absolute top-50 start-50">
+          Loading...
+        </Spinner>
+      )}
       {userHasErrors && "Error Loading user data..."}
       {userIsLoaded && !userHasErrors && !userData.access_token && (
         <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column justify-content-center align-items-center overflow-hidden">
@@ -153,6 +157,12 @@ const Dashboard = (props) => {
         <>
           {refreshRequired && <RefreshOverlay handleRefreshToken={handleRefreshToken} />}
           <div>
+            {!spotifyIsLoaded &&
+              !spotifyData.playlists && !spotifyData.user && !spotifyData.combinedPlaylists && (
+                <Spinner color="secondary" className="position-absolute top-50 start-50">
+                  Loading...
+                </Spinner>
+              )}
             {spotifyHasErrors && `Error Loading: ${spotifyErrorMsg}`}
             {spotifyIsLoaded && spotifyData.playlists && <CreateComboPlaylist />}
 
