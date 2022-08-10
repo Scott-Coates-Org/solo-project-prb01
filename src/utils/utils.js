@@ -2,7 +2,6 @@ import { _fetchAllCombinedPlaylistsFromDb } from "redux/spotify";
 import { _fetchUserFromDb } from "redux/user";
 import { spotifyService } from "components/services/spotifyService";
 import {
-  _getAllSongsFromPlaylist,
   _deleteSongsFromPlaylist,
   _addSongsToPlaylist,
 } from "components/services/spotifyService";
@@ -60,7 +59,7 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       if (!playlist) continue;
 
       // get all songs in combined playlist
-      const tracks = await _getAllSongsFromPlaylist(combo.id, user.access_token);
+      const tracks = await spotifyService.getAllSongsFromPlaylist(combo.id, user.access_token);
       const tracksURI = tracks.map((track) => ({
         uri: track.track.uri,
       }));
@@ -82,7 +81,7 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       const tracksToAdd = [];
       for (const playlist of combo.playlists) {
         // get all songs from playlist, add to array
-        const tracks = await _getAllSongsFromPlaylist(playlist.id, user.access_token);
+        const tracks = await spotifyService.getAllSongsFromPlaylist(playlist.id, user.access_token);
         const tracksNotLocal = tracks.filter((track) => !track.track.is_local).map((track) => track.track.uri)
         tracksToAdd.push(
           ...tracksNotLocal
@@ -133,7 +132,7 @@ export const refreshNewCombinedPlaylist = async (combo, access_token) => {
     const tracksToAdd = [];
     for (const playlist of combo.playlists) {
       // get all songs from playlist, add to array
-      const tracks = await _getAllSongsFromPlaylist(playlist.id, access_token);
+      const tracks = await spotifyService.getAllSongsFromPlaylist(playlist.id, access_token);
       tracksToAdd.push(
         ...tracks.filter((track) => !track.track.is_local).map((track) => track.track.uri)
       );
