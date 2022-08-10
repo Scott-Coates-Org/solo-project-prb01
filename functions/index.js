@@ -128,34 +128,3 @@ exports.getPlaylist = functions.https.onCall(async (data, context) => {
 
   return spotifyAPICalls(context, opts);
 });
-
-// export async function _getPlaylists(user, access_token, uri = null) {
-//   const opts = {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: "Bearer " + access_token,
-//     },
-//   };
-
-//   const response = await fetch(
-//     uri || `${apiURI}/users/${user}/playlists?offset=0&limit=50`,
-//     opts
-//   );
-
-//   return response;
-// }
-
-// export async function _getPlaylist(playlist_id, access_token) {
-//   const opts = {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: "Bearer " + access_token,
-//     },
-//   };
-
-//   const response = await fetch(`${apiURI}/playlists/${playlist_id}`, opts);
-
-//   return response;
-// }
