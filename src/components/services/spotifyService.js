@@ -22,6 +22,10 @@ async function getMe(access_token) {
   return spotifyAPICall("getMe", { access_token });
 }
 
+async function getAllPlaylists(user, access_token) {
+  return spotifyAPICall("getAllPlaylists", { user, access_token });
+}
+
 async function getPlaylists(user, access_token, uri = null) {
   return spotifyAPICall("getPlaylists", { user, access_token, uri });
 }
@@ -162,6 +166,7 @@ export const spotifyService = {
   getAccessToken,
   getRefreshedAccessToken,
   getMe,
+  getAllPlaylists,
   getPlaylists,
   getPlaylist,
 };
