@@ -233,3 +233,24 @@ exports.createPlaylist = functions.https.onCall(async (data, context) => {
 
   return spotifyAPICalls(context, opts);
 });
+
+//API call to add tracks to a playlist
+//Can only add 100 tracks at a time
+//Tracks are an array of spotify track uris {"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M",
+exports.addSongsToPlaylist = functions.https.onCall(async (data, context) => {
+  const { playlist_id, access_token, uris } = data;
+  const payload = {
+    uris
+  };
+  const opts = {
+    url: `${apiURI}/playlists/${playlist_id}/tracks`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+    data: JSON.stringify(payload),
+  };
+
+  return spotifyAPICalls(context, opts);
+});
