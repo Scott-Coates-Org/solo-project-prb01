@@ -1,7 +1,6 @@
 import { _fetchAllCombinedPlaylistsFromDb } from "redux/spotify";
 import { _fetchUserFromDb } from "redux/user";
 import { spotifyService } from "services/spotifyService";
-import { _addSongsToPlaylist } from "services/spotifyService";
 
 // VARIABLES
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;

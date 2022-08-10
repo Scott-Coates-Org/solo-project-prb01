@@ -62,6 +62,10 @@ async function addSongsToPlaylist(playlist_id, access_token, uris) {
   return cloudAPICall("addSongsToPlaylist", { playlist_id, access_token, uris });
 }
 
+async function adminRefreshAllCombinedPlaylists() {
+  return cloudAPICall("adminRefreshAllCombinedPlaylists");
+}
+
 export const spotifyService = {
   getAccessToken,
   getRefreshedAccessToken,
@@ -73,4 +77,5 @@ export const spotifyService = {
   unfollowPlaylist,
   createPlaylist,
   addSongsToPlaylist,
+  adminRefreshAllCombinedPlaylists,
 };
