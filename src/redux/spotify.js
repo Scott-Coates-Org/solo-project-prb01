@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   _createPlaylist,
-  _getMe,
   _getPlaylists,
   _unfollowPlaylist,
 } from "components/services/spotifyService";
+import { spotifyService } from "components/services/spotifyService";
 import firebaseClient from "firebase/client";
 import firebase from "firebase/app";
 
@@ -75,15 +75,11 @@ export const fetchSpotifyMe = createAsyncThunk(
   async (payload, thunkAPI) => {
     try {
       thunkAPI.dispatch(appendData());
-      const response = await _getMe(payload.access_token);
 
-      if (response.status !== 200) {
-        const errorMsg = await response.text();
-        throw { message: errorMsg };
-      }
+      const data = await spotifyService.getMe(payload.access_token);
 
-      const data = await response.json();
       thunkAPI.dispatch(appendDataSuccess({ user: data }));
+
       return data.id;
     } catch (error) {
       thunkAPI.dispatch(appendDataFailure(error.message));
