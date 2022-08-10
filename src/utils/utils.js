@@ -2,7 +2,6 @@ import { _fetchAllCombinedPlaylistsFromDb } from "redux/spotify";
 import { _fetchUserFromDb } from "redux/user";
 import { spotifyService } from "components/services/spotifyService";
 import {
-  _deleteSongsFromPlaylist,
   _addSongsToPlaylist,
 } from "components/services/spotifyService";
 
@@ -67,14 +66,14 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       // remove all songs in combined playlist
       console.log(`REMOVING ${tracksURI.length} tracks in CombinedPlaylist`);
       while (tracksURI.length > 0) {
-        const deleteResponse = await _deleteSongsFromPlaylist(combo.id, user.access_token, {
+        const deleteResponse = await spotifyService.deleteSongsFromPlaylist(combo.id, user.access_token, {
           tracks: tracksURI.splice(0, 100),
         });
 
-        if (deleteResponse.status !== 200) {
-          const errorMsg = await deleteResponse.text();
-          throw { message: errorMsg };
-        }
+        // if (deleteResponse.status !== 200) {
+        //   const errorMsg = await deleteResponse.text();
+        //   throw { message: errorMsg };
+        // }
       }
 
       // loop through playlists
