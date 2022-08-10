@@ -146,3 +146,35 @@ exports.getPlaylist = functions.https.onCall(async (data, context) => {
 
   return spotifyAPICalls(context, opts);
 });
+
+const getSongsFromPlaylist = (playlist_id, access_token, uri, context) => {
+  const opts = {
+    url: uri || `${apiURI}/playlists/${playlist_id}/tracks?limit=50`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+  };
+
+  return spotifyAPICalls(context, opts);
+};
+
+exports.getAllSongsFromPlaylist = functions.https.onCall(async (data, context) => {
+  const { playlist_id, access_token } = data;
+  const songs = [];
+  let response = { next: "first" };
+
+  while (response.next) {
+    response = await getSongsFromPlaylist(
+      playlist_id,
+      access_token,
+      response.next === "first" ? null : response.next,
+      context
+    );
+
+    songs.push(...response.items);
+  }
+
+  return songs;
+});
