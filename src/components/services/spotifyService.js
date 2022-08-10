@@ -30,52 +30,8 @@ async function getPlaylist(playlist_id, access_token) {
   return spotifyAPICall("getPlaylist", { playlist_id, access_token });
 }
 
-export async function _getAllSongsFromPlaylist(playlist_id, access_token) {
-  const songs = [];
-  // let response = await _getSongsFromPlaylist(playlist_id, access_token);
-  // songs.push(...response.items);
-
-  // while (response.next) {
-  //   response = await _getSongsFromPlaylist(playlist_id, access_token, response.next);
-  //   songs.push(...response.items);
-  // }
-
-  let response = { next: "first" };
-
-  while (response.next) {
-    response = await _getSongsFromPlaylist(
-      playlist_id,
-      access_token,
-      response.next === "first" ? null : response.next
-    );
-
-    if (response.status !== 200) {
-      const errorMsg = await response.text();
-      throw { message: errorMsg };
-    }
-
-    response = await response.json();
-    songs.push(...response.items);
-  }
-
-  return songs;
-}
-
-async function _getSongsFromPlaylist(playlist_id, access_token, uri = null) {
-  const opts = {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-  };
-
-  const response = await fetch(
-    uri || `${apiURI}/playlists/${playlist_id}/tracks?limit=50`,
-    opts
-  );
-
-  return response;
+async function getAllSongsFromPlaylist(playlist_id, access_token) {
+  return spotifyAPICall("getAllSongsFromPlaylist", { playlist_id, access_token });
 }
 
 //API call to delete songs from playlist
@@ -164,4 +120,5 @@ export const spotifyService = {
   getMe,
   getAllPlaylists,
   getPlaylist,
+  getAllSongsFromPlaylist,
 };
