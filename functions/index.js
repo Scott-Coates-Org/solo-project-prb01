@@ -96,3 +96,33 @@ exports.getRefreshedAccessToken = functions.https.onCall(async (data, context) =
     }
   }
 });
+
+exports.getMe = functions.https.onCall(async (data, context) => {
+  const { access_token } = data;
+
+  checkUserLoggedIn(context);
+
+  try {
+    const response = await axios({
+      url: `${apiURI}/me`,
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer" + access_token,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      // The request was made and the server responded with a non 2.x.x status
+      throw new functions.https.HttpsError("unknown", error.message);
+    } else if (error.request) {
+      // The request was made but no response was received
+      throw new functions.https.HttpsError("unavailable", "No response received.");
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log("Error", error.message);
+    }
+  }
+});
