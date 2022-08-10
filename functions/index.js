@@ -196,3 +196,31 @@ exports.deleteSongsFromPlaylist = functions.https.onCall(async (data, context) =
 
   return spotifyAPICalls(context, opts);
 });
+
+exports.unfollowPlaylist = functions.https.onCall(async (data, context) => {
+  const { playlist_id, access_token } = data;
+  const opts = {
+    url: `${apiURI}/playlists/${playlist_id}/followers`,
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+  };
+
+  return spotifyAPICalls(context, opts);
+});
+
+// export async function _unfollowPlaylist(playlist_id, access_token) {
+//   const opts = {
+//     method: "DELETE",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: "Bearer " + access_token,
+//     },
+//   };
+
+//   const response = await fetch(`${apiURI}/playlists/${playlist_id}/followers`, opts);
+
+//   return response;
+// }
