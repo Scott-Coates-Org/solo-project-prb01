@@ -42,20 +42,6 @@ async function unfollowPlaylist(playlist_id, access_token) {
   return cloudAPICall("unfollowPlaylist", { playlist_id, access_token });
 }
 
-// export async function _unfollowPlaylist(playlist_id, access_token) {
-//   const opts = {
-//     method: "DELETE",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: "Bearer " + access_token,
-//     },
-//   };
-
-//   const response = await fetch(`${apiURI}/playlists/${playlist_id}/followers`, opts);
-
-//   return response;
-// }
-
 //API call to create a new playlist for a specific user id
 export async function _createPlaylist(
   user_id,
