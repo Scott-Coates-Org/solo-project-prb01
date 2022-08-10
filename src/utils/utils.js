@@ -105,16 +105,11 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       // add all songs to combined playlist
       console.log(`ADDING ${tracksToAdd.length} tracks to Combined Playlist`);
       while (tracksToAdd.length > 0) {
-        const addResponse = await _addSongsToPlaylist(
+        const addResponse = await spotifyService.addSongsToPlaylist(
           combo.id,
           user.access_token,
           tracksToAdd.splice(0, 100)
         );
-
-        if (addResponse.status !== 201) {
-          const errorMsg = await addResponse.text();
-          throw { message: errorMsg };
-        }
       }
       console.log(`DONE combining for ${combo.name}`);
     }
@@ -152,16 +147,11 @@ export const refreshNewCombinedPlaylist = async (combo, access_token) => {
     // add all songs to combined playlist
     console.log(`ADDING ${tracksToAdd.length} tracks to Combined Playlist`);
     while (tracksToAdd.length > 0) {
-      const addResponse = await _addSongsToPlaylist(
+      const addResponse = await spotifyService.addSongsToPlaylist(
         combo.id,
         access_token,
         tracksToAdd.splice(0, 100)
       );
-
-      if (addResponse.status !== 201) {
-        const errorMsg = await addResponse.text();
-        throw { message: errorMsg };
-      }
     }
     console.log(`DONE combining for ${combo.name}`);
   } catch (error) {
