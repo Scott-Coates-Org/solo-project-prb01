@@ -115,7 +115,7 @@ const getPlaylists = (user, access_token, uri, context) => {
 };
 
 exports.getAllPlaylists = functions.https.onCall(async (data, context) => {
-  const {user, access_token} = data
+  const { user, access_token } = data;
   const playlists = [];
   let response = { next: "first" };
 
@@ -177,4 +177,22 @@ exports.getAllSongsFromPlaylist = functions.https.onCall(async (data, context) =
   }
 
   return songs;
+});
+
+//API call to delete songs from playlist
+//Can only delete 100 at a time
+//Tracks are in array json format: {"tracks": [{ "uri": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh" },{ "uri": "spotify:track:1301WleyT98MSxVHPZCA6M" }] }
+exports.deleteSongsFromPlaylist = functions.https.onCall(async (data, context) => {
+  const { playlist_id, access_token, tracks } = data;
+  const opts = {
+    url: `${apiURI}/playlists/${playlist_id}/tracks`,
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+    data: JSON.stringify(tracks),
+  };
+
+  return spotifyAPICalls(context, opts);
 });
