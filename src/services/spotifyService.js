@@ -2,8 +2,6 @@ import firebase from "firebase/app";
 require("firebase/functions");
 firebase.functions().useEmulator("localhost", 5001);
 
-const apiURI = "https://api.spotify.com/v1";
-
 async function cloudAPICall(cloudFunction, payload) {
   const _functionCall = firebase.functions().httpsCallable(cloudFunction);
   const { data } = await _functionCall(payload);

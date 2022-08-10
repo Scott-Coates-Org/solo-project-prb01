@@ -8,32 +8,20 @@ import Nav from "components/nav/Nav";
 import CreateComboPlaylist from "components/playlists/CreateComboPlaylist";
 import ListOfComboPlaylists from "components/playlists/ListOfComboPlaylists";
 import {
-  adminRefreshAllCombinedPlaylists,
   getDifferenceInMins,
   spotifyLogin,
 } from "utils/utils";
-import { addSpotifyAuth, updateSpotifyAuth, _fetchUserFromDb } from "redux/user";
+import { addSpotifyAuth, updateSpotifyAuth } from "redux/user";
 import {
-  _fetchAllCombinedPlaylistsFromDb,
   fetchSpotifyMe,
   fetchSpotifyPlaylists,
   fetchCombinedPlaylistsByUid,
 } from "redux/spotify";
-import {
-  _addSongsToPlaylist,
-  _deleteSongsFromPlaylist,
-  _getAllSongsFromPlaylist,
-  _getPlaylist,
-  _getRefreshedAccessToken,
-} from "services/spotifyService";
 import RefreshOverlay from "./RefreshOverlay";
 
 const Dashboard = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-  const spotifyState = process.env.REACT_APP_SPOTIFY_STATE;
-  const baseURI = "https://accounts.spotify.com";
   const redirectURI = `${window.location.origin}/dashboard`;
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
