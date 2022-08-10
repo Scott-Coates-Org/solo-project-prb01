@@ -4,53 +4,57 @@ firebase.functions().useEmulator("localhost", 5001);
 
 const apiURI = "https://api.spotify.com/v1";
 
-async function spotifyAPICall(cloudFunction, payload) {
+async function cloudAPICall(cloudFunction, payload) {
   const _functionCall = firebase.functions().httpsCallable(cloudFunction);
   const { data } = await _functionCall(payload);
   return data;
 }
 
 async function getAccessToken(code, state, redirectURI) {
-  return spotifyAPICall("getAccessToken", { code, state, redirectURI });
+  return cloudAPICall("getAccessToken", { code, state, redirectURI });
 }
 
 async function getRefreshedAccessToken(refreshToken, redirectURI) {
-  return spotifyAPICall("getRefreshedAccessToken", { refreshToken, redirectURI });
+  return cloudAPICall("getRefreshedAccessToken", { refreshToken, redirectURI });
 }
 
 async function getMe(access_token) {
-  return spotifyAPICall("getMe", { access_token });
+  return cloudAPICall("getMe", { access_token });
 }
 
 async function getAllPlaylists(user, access_token) {
-  return spotifyAPICall("getAllPlaylists", { user, access_token });
+  return cloudAPICall("getAllPlaylists", { user, access_token });
 }
 
 async function getPlaylist(playlist_id, access_token) {
-  return spotifyAPICall("getPlaylist", { playlist_id, access_token });
+  return cloudAPICall("getPlaylist", { playlist_id, access_token });
 }
 
 async function getAllSongsFromPlaylist(playlist_id, access_token) {
-  return spotifyAPICall("getAllSongsFromPlaylist", { playlist_id, access_token });
+  return cloudAPICall("getAllSongsFromPlaylist", { playlist_id, access_token });
 }
 
 async function deleteSongsFromPlaylist(playlist_id, access_token, tracks) {
-  return spotifyAPICall("deleteSongsFromPlaylist", { playlist_id, access_token, tracks });
+  return cloudAPICall("deleteSongsFromPlaylist", { playlist_id, access_token, tracks });
 }
 
-export async function _unfollowPlaylist(playlist_id, access_token) {
-  const opts = {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-  };
-
-  const response = await fetch(`${apiURI}/playlists/${playlist_id}/followers`, opts);
-
-  return response;
+async function unfollowPlaylist(playlist_id, access_token) {
+  return cloudAPICall("unfollowPlaylist", { playlist_id, access_token });
 }
+
+// export async function _unfollowPlaylist(playlist_id, access_token) {
+//   const opts = {
+//     method: "DELETE",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: "Bearer " + access_token,
+//     },
+//   };
+
+//   const response = await fetch(`${apiURI}/playlists/${playlist_id}/followers`, opts);
+
+//   return response;
+// }
 
 //API call to create a new playlist for a specific user id
 export async function _createPlaylist(
@@ -107,5 +111,6 @@ export const spotifyService = {
   getAllPlaylists,
   getPlaylist,
   getAllSongsFromPlaylist,
-  deleteSongsFromPlaylist
+  deleteSongsFromPlaylist,
+  unfollowPlaylist,
 };
