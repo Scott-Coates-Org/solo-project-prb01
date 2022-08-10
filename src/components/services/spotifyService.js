@@ -2,10 +2,6 @@ import firebase from "firebase/app";
 require("firebase/functions");
 firebase.functions().useEmulator("localhost", 5001);
 
-const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
-const spotifyState = process.env.REACT_APP_SPOTIFY_STATE;
-const baseURI = "https://accounts.spotify.com";
 const apiURI = "https://api.spotify.com/v1";
 
 async function getAccessToken(code, state, redirectURI) {
@@ -25,6 +21,12 @@ async function getRefreshedAccessToken(refreshToken, redirectURI) {
 async function getMe(access_token) {
   const _getMe = firebase.functions().httpsCallable("getMe");
   const { data } = await _getMe({ access_token });
+  return data;
+}
+
+async function getPlaylists(user, access_token, uri = null) {
+  const _getPlaylists = firebase.functions().httpsCallable("getPlaylists");
+  const { data } = await _getPlaylists({ user, access_token, uri });
   return data;
 }
 
@@ -187,4 +189,4 @@ export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
   return response;
 }
 
-export const spotifyService = { getAccessToken, getRefreshedAccessToken, getMe };
+export const spotifyService = { getAccessToken, getRefreshedAccessToken, getMe, getPlaylists };
