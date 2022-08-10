@@ -30,20 +30,6 @@ async function getPlaylist(playlist_id, access_token) {
   return spotifyAPICall("getPlaylist", { playlist_id, access_token });
 }
 
-export async function _getPlaylist(playlist_id, access_token) {
-  const opts = {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-  };
-
-  const response = await fetch(`${apiURI}/playlists/${playlist_id}`, opts);
-
-  return response;
-}
-
 export async function _getAllSongsFromPlaylist(playlist_id, access_token) {
   const songs = [];
   // let response = await _getSongsFromPlaylist(playlist_id, access_token);

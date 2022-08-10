@@ -2,7 +2,6 @@ import { _fetchAllCombinedPlaylistsFromDb } from "redux/spotify";
 import { _fetchUserFromDb } from "redux/user";
 import { spotifyService } from "components/services/spotifyService";
 import {
-  _getPlaylist,
   _getAllSongsFromPlaylist,
   _deleteSongsFromPlaylist,
   _addSongsToPlaylist,
@@ -57,7 +56,7 @@ export const adminRefreshAllCombinedPlaylists = async () => {
 
       //   check playlist still exists, else next
       const playlist = await spotifyService.getPlaylist(combo.id, user.access_token);
-      
+
       if (!playlist) continue;
 
       // get all songs in combined playlist
