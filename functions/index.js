@@ -19,32 +19,11 @@ const checkUserLoggedIn = (context) => {
   }
 };
 
-exports.getAccessToken = functions.https.onCall(async (data, context) => {
-  const { code, state, redirectURI } = data;
-
+const spotifyAPICalls = async (context, opts) => {
   checkUserLoggedIn(context);
 
-  if (state !== spotifyState) {
-    throw new functions.https.HttpsError("invalid-argument", "States are not the same");
-  }
-
-  const formBody = new URLSearchParams();
-  formBody.set("grant_type", "authorization_code");
-  formBody.set("code", code);
-  formBody.set("redirect_uri", redirectURI);
-
   try {
-    const response = await axios({
-      url: `${baseURI}/api/token`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization:
-          "Basic " + new Buffer.from(clientId + ":" + clientSecret).toString("base64"),
-      },
-      data: formBody,
-    });
-
+    const response = await axios(opts);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -58,53 +37,93 @@ exports.getAccessToken = functions.https.onCall(async (data, context) => {
       console.log("Error", error.message);
     }
   }
+};
+
+exports.getAccessToken = functions.https.onCall(async (data, context) => {
+  const { code, state, redirectURI } = data;
+
+  const formBody = new URLSearchParams();
+    formBody.set("grant_type", "authorization_code");
+    formBody.set("code", code);
+    formBody.set("redirect_uri", redirectURI);
+
+  const opts = {
+    url: `${baseURI}/api/token`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization:
+        "Basic " + new Buffer.from(clientId + ":" + clientSecret).toString("base64"),
+    },
+    data: formBody,
+  };
+
+  if (state !== spotifyState) {
+    throw new functions.https.HttpsError("invalid-argument", "States are not the same");
+  }
+
+  return spotifyAPICalls(context, opts);
 });
 
 exports.getRefreshedAccessToken = functions.https.onCall(async (data, context) => {
   const { refreshToken, redirectURI } = data;
-
-  checkUserLoggedIn(context);
 
   const formBody = new URLSearchParams();
   formBody.set("grant_type", "refresh_token");
   formBody.set("refresh_token", refreshToken);
   formBody.set("redirect_uri", redirectURI);
 
-  try {
-    const response = await axios({
-      url: `${baseURI}/api/token`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization:
-          "Basic " + new Buffer.from(clientId + ":" + clientSecret).toString("base64"),
-      },
-      data: formBody,
-    });
+  const opts = {
+    url: `${baseURI}/api/token`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization:
+        "Basic " + new Buffer.from(clientId + ":" + clientSecret).toString("base64"),
+    },
+    data: formBody,
+  };
 
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      // The request was made and the server responded with a non 2.x.x status
-      throw new functions.https.HttpsError("unknown", error.message);
-    } else if (error.request) {
-      // The request was made but no response was received
-      throw new functions.https.HttpsError("unavailable", "No response received.");
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log("Error", error.message);
-    }
-  }
+  return spotifyAPICalls(context, opts);
 });
 
 exports.getMe = functions.https.onCall(async (data, context) => {
   const { access_token } = data;
+  const opts = {
+    url: `${apiURI}/me`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+  };
+
+  return spotifyAPICalls(context, opts);
+});
+
+exports.getPlaylists = functions.https.onCall(async (data, context) => {
+  const { user, access_token, uri } = data;
+  const opts = {
+    url: uri || `${apiURI}/users/${user}/playlists?offset=0&limit=50`,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+  };
+  console.log({ uri });
+
+  return spotifyAPICalls(context, opts);
+});
+
+exports.getPlaylist = functions.https.onCall(async (data, context) => {
+  const { playlist_id, access_token } = data;
 
   checkUserLoggedIn(context);
 
   try {
     const response = await axios({
-      url: `${apiURI}/me`,
+      url: `${apiURI}/playlists/${playlist_id}`,
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -126,3 +145,34 @@ exports.getMe = functions.https.onCall(async (data, context) => {
     }
   }
 });
+
+// export async function _getPlaylists(user, access_token, uri = null) {
+//   const opts = {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: "Bearer " + access_token,
+//     },
+//   };
+
+//   const response = await fetch(
+//     uri || `${apiURI}/users/${user}/playlists?offset=0&limit=50`,
+//     opts
+//   );
+
+//   return response;
+// }
+
+// export async function _getPlaylist(playlist_id, access_token) {
+//   const opts = {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: "Bearer " + access_token,
+//     },
+//   };
+
+//   const response = await fetch(`${apiURI}/playlists/${playlist_id}`, opts);
+
+//   return response;
+// }
