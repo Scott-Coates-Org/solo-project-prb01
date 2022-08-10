@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { _createPlaylist, _unfollowPlaylist } from "components/services/spotifyService";
+import { _createPlaylist } from "components/services/spotifyService";
 import { spotifyService } from "components/services/spotifyService";
 import firebaseClient from "firebase/client";
 import firebase from "firebase/app";
@@ -152,14 +152,9 @@ export const deleteCombinedPlaylist = createAsyncThunk(
   "spotify/deleteCombinedPlaylist",
   async (payload, thunkAPI) => {
     try {
-      const response = await _unfollowPlaylist(payload.id, payload.access_token);
+      await spotifyService.unfollowPlaylist(payload.id, payload.access_token);
 
-      if (response.status !== 200) {
-        const errorMsg = await response.text();
-        throw { message: errorMsg };
-      }
-
-      const snapshot = await _deleteCombinedPlaylistFromDb(payload.id);
+      await _deleteCombinedPlaylistFromDb(payload.id);
       thunkAPI.dispatch(removeCombinedPlaylist(payload));
     } catch (error) {
       console.log(error.message);
