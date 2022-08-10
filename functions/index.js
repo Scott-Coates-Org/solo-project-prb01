@@ -233,28 +233,3 @@ exports.createPlaylist = functions.https.onCall(async (data, context) => {
 
   return spotifyAPICalls(context, opts);
 });
-
-// export async function _createPlaylist(
-//   user_id,
-//   access_token,
-//   name,
-//   description = "Combined playlist"
-// ) {
-//   const data = {
-//     name,
-//     description,
-//   };
-
-//   const opts = {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: "Bearer " + access_token,
-//     },
-//     body: JSON.stringify(data),
-//   };
-
-//   const response = await fetch(`${apiURI}/users/${user_id}/playlists`, opts);
-
-//   return response;
-// }
