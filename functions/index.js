@@ -59,7 +59,10 @@ exports.getAccessToken = functions.https.onCall(async (data, context) => {
   };
 
   if (state !== spotifyState) {
-    throw new functions.https.HttpsError("invalid-argument", "States are not the same");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "States are not the same"
+    );
   }
 
   return spotifyAPICalls(context, opts);
@@ -211,16 +214,47 @@ exports.unfollowPlaylist = functions.https.onCall(async (data, context) => {
   return spotifyAPICalls(context, opts);
 });
 
-// export async function _unfollowPlaylist(playlist_id, access_token) {
+//API call to create a new playlist for a specific user id
+exports.createPlaylist = functions.https.onCall(async (data, context) => {
+  const { user_id, access_token, name, description } = data;
+  const payload = {
+    name,
+    description,
+  };
+  const opts = {
+    url: `${apiURI}/users/${user_id}/playlists`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + access_token,
+    },
+    data: JSON.stringify(payload),
+  };
+
+  return spotifyAPICalls(context, opts);
+});
+
+// export async function _createPlaylist(
+//   user_id,
+//   access_token,
+//   name,
+//   description = "Combined playlist"
+// ) {
+//   const data = {
+//     name,
+//     description,
+//   };
+
 //   const opts = {
-//     method: "DELETE",
+//     method: "POST",
 //     headers: {
 //       "Content-Type": "application/json",
 //       Authorization: "Bearer " + access_token,
 //     },
+//     body: JSON.stringify(data),
 //   };
 
-//   const response = await fetch(`${apiURI}/playlists/${playlist_id}/followers`, opts);
+//   const response = await fetch(`${apiURI}/users/${user_id}/playlists`, opts);
 
 //   return response;
 // }

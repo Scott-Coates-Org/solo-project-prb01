@@ -35,37 +35,29 @@ async function getAllSongsFromPlaylist(playlist_id, access_token) {
 }
 
 async function deleteSongsFromPlaylist(playlist_id, access_token, tracks) {
-  return cloudAPICall("deleteSongsFromPlaylist", { playlist_id, access_token, tracks });
+  return cloudAPICall("deleteSongsFromPlaylist", {
+    playlist_id,
+    access_token,
+    tracks,
+  });
 }
 
 async function unfollowPlaylist(playlist_id, access_token) {
   return cloudAPICall("unfollowPlaylist", { playlist_id, access_token });
 }
 
-//API call to create a new playlist for a specific user id
-export async function _createPlaylist(
+async function createPlaylist(
   user_id,
   access_token,
   name,
   description = "Combined playlist"
 ) {
-  const data = {
+  return cloudAPICall("createPlaylist", {
+    user_id,
+    access_token,
     name,
     description,
-  };
-
-  const opts = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-    body: JSON.stringify(data),
-  };
-
-  const response = await fetch(`${apiURI}/users/${user_id}/playlists`, opts);
-
-  return response;
+  });
 }
 
 //API call to add tracks to a playlist
@@ -99,4 +91,5 @@ export const spotifyService = {
   getAllSongsFromPlaylist,
   deleteSongsFromPlaylist,
   unfollowPlaylist,
+  createPlaylist
 };

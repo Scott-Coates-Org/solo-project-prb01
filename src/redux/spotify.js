@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { _createPlaylist } from "components/services/spotifyService";
-import { spotifyService } from "components/services/spotifyService";
+import { _createPlaylist } from "services/spotifyService";
+import { spotifyService } from "services/spotifyService";
 import firebaseClient from "firebase/client";
 import firebase from "firebase/app";
 
@@ -126,18 +126,12 @@ export const createCombinedPlaylist = createAsyncThunk(
   "spotify/createCombinedPlaylist",
   async (payload, thunkAPI) => {
     try {
-      const response = await _createPlaylist(
+      const data = await spotifyService.createPlaylist(
         payload.spotifyId,
         payload.access_token,
         payload.name
       );
 
-      if (response.status !== 201) {
-        const errorMsg = await response.text();
-        throw { message: errorMsg };
-      }
-
-      const data = await response.json();
       await _createCombinedPlaylistInDb(payload.uid, payload.name, data.id, payload.playlists);
 
       return data.id;

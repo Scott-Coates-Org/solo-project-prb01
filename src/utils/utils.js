@@ -1,9 +1,7 @@
 import { _fetchAllCombinedPlaylistsFromDb } from "redux/spotify";
 import { _fetchUserFromDb } from "redux/user";
-import { spotifyService } from "components/services/spotifyService";
-import {
-  _addSongsToPlaylist,
-} from "components/services/spotifyService";
+import { spotifyService } from "services/spotifyService";
+import { _addSongsToPlaylist } from "services/spotifyService";
 
 // VARIABLES
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
@@ -50,7 +48,10 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       console.log(`REFRESHING ${combo.name} for ${user.uid}`);
 
       // refresh token
-      user = await spotifyService.getRefreshedAccessToken(user.refresh_token, redirectURI);
+      user = await spotifyService.getRefreshedAccessToken(
+        user.refresh_token,
+        redirectURI
+      );
 
       //   check playlist still exists, else next
       const playlist = await spotifyService.getPlaylist(combo.id, user.access_token);
@@ -58,7 +59,10 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       if (!playlist) continue;
 
       // get all songs in combined playlist
-      const tracks = await spotifyService.getAllSongsFromPlaylist(combo.id, user.access_token);
+      const tracks = await spotifyService.getAllSongsFromPlaylist(
+        combo.id,
+        user.access_token
+      );
       const tracksURI = tracks.map((track) => ({
         uri: track.track.uri,
       }));
@@ -66,9 +70,13 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       // remove all songs in combined playlist
       console.log(`REMOVING ${tracksURI.length} tracks in CombinedPlaylist`);
       while (tracksURI.length > 0) {
-        const deleteResponse = await spotifyService.deleteSongsFromPlaylist(combo.id, user.access_token, {
-          tracks: tracksURI.splice(0, 100),
-        });
+        const deleteResponse = await spotifyService.deleteSongsFromPlaylist(
+          combo.id,
+          user.access_token,
+          {
+            tracks: tracksURI.splice(0, 100),
+          }
+        );
 
         // if (deleteResponse.status !== 200) {
         //   const errorMsg = await deleteResponse.text();
@@ -80,11 +88,14 @@ export const adminRefreshAllCombinedPlaylists = async () => {
       const tracksToAdd = [];
       for (const playlist of combo.playlists) {
         // get all songs from playlist, add to array
-        const tracks = await spotifyService.getAllSongsFromPlaylist(playlist.id, user.access_token);
-        const tracksNotLocal = tracks.filter((track) => !track.track.is_local).map((track) => track.track.uri)
-        tracksToAdd.push(
-          ...tracksNotLocal
+        const tracks = await spotifyService.getAllSongsFromPlaylist(
+          playlist.id,
+          user.access_token
         );
+        const tracksNotLocal = tracks
+          .filter((track) => !track.track.is_local)
+          .map((track) => track.track.uri);
+        tracksToAdd.push(...tracksNotLocal);
 
         console.log(`BUFFERING ${tracksNotLocal.length} from ${playlist.name}`);
       }
@@ -117,23 +128,22 @@ export const adminRefreshAllCombinedPlaylists = async () => {
 export const refreshNewCombinedPlaylist = async (combo, access_token) => {
   try {
     //   check playlist still exists, else return
-    const playlistResponse = await _getPlaylist(combo.id, access_token);
+    const playlist = await spotifyService.getPlaylist(combo.id, access_token);
 
-    if (playlistResponse.status !== 200) {
-      const errorMsg = await playlistResponse.text();
-      throw { message: errorMsg };
-    }
-
-    const playlistExists = await playlistResponse.json();
-    if (!playlistExists) throw "Combined playlist does not exist";
+    if (!playlist) throw "Combined playlist does not exist";
 
     // loop through playlists
     const tracksToAdd = [];
     for (const playlist of combo.playlists) {
       // get all songs from playlist, add to array
-      const tracks = await spotifyService.getAllSongsFromPlaylist(playlist.id, access_token);
+      const tracks = await spotifyService.getAllSongsFromPlaylist(
+        playlist.id,
+        access_token
+      );
       tracksToAdd.push(
-        ...tracks.filter((track) => !track.track.is_local).map((track) => track.track.uri)
+        ...tracks
+          .filter((track) => !track.track.is_local)
+          .map((track) => track.track.uri)
       );
 
       console.log(`BUFFERING ${tracks.length} from ${playlist.name}`);
@@ -155,6 +165,6 @@ export const refreshNewCombinedPlaylist = async (combo, access_token) => {
     }
     console.log(`DONE combining for ${combo.name}`);
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   }
 };

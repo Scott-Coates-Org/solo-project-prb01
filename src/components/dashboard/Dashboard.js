@@ -25,7 +25,7 @@ import {
   _getAllSongsFromPlaylist,
   _getPlaylist,
   _getRefreshedAccessToken,
-} from "components/services/spotifyService";
+} from "services/spotifyService";
 import RefreshOverlay from "./RefreshOverlay";
 
 const Dashboard = (props) => {
