@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   _createPlaylist,
-  _getPlaylists,
   _unfollowPlaylist,
 } from "components/services/spotifyService";
 import { spotifyService } from "components/services/spotifyService";
