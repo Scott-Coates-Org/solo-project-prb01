@@ -50,7 +50,7 @@ async function createPlaylist(
   user_id,
   access_token,
   name,
-  description = "Combined playlist"
+  description = "Combined playlist made with SpotList (spotlist.prb01.com)"
 ) {
   return cloudAPICall("createPlaylist", {
     user_id,
@@ -60,26 +60,8 @@ async function createPlaylist(
   });
 }
 
-//API call to add tracks to a playlist
-//Can only add 100 tracks at a time
-//Tracks are an array of spotify track uris {"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M",
-export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
-  const data = {
-    uris,
-  };
-
-  const opts = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-    body: JSON.stringify(data),
-  };
-
-  const response = await fetch(`${apiURI}/playlists/${playlist_id}/tracks`, opts);
-
-  return response;
+async function addSongsToPlaylist(playlist_id, access_token, uris) {
+  return cloudAPICall("addSongsToPlaylist", { playlist_id, access_token, uris });
 }
 
 export const spotifyService = {
@@ -91,5 +73,6 @@ export const spotifyService = {
   getAllSongsFromPlaylist,
   deleteSongsFromPlaylist,
   unfollowPlaylist,
-  createPlaylist
+  createPlaylist,
+  addSongsToPlaylist,
 };
