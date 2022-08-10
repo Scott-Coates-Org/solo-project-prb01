@@ -43,9 +43,9 @@ exports.getAccessToken = functions.https.onCall(async (data, context) => {
   const { code, state, redirectURI } = data;
 
   const formBody = new URLSearchParams();
-    formBody.set("grant_type", "authorization_code");
-    formBody.set("code", code);
-    formBody.set("redirect_uri", redirectURI);
+  formBody.set("grant_type", "authorization_code");
+  formBody.set("code", code);
+  formBody.set("redirect_uri", redirectURI);
 
   const opts = {
     url: `${baseURI}/api/token`,
@@ -101,8 +101,7 @@ exports.getMe = functions.https.onCall(async (data, context) => {
   return spotifyAPICalls(context, opts);
 });
 
-exports.getPlaylists = functions.https.onCall(async (data, context) => {
-  const { user, access_token, uri } = data;
+const getPlaylists = (user, access_token, uri, context) => {
   const opts = {
     url: uri || `${apiURI}/users/${user}/playlists?offset=0&limit=50`,
     method: "GET",
@@ -113,6 +112,25 @@ exports.getPlaylists = functions.https.onCall(async (data, context) => {
   };
 
   return spotifyAPICalls(context, opts);
+};
+
+exports.getAllPlaylists = functions.https.onCall(async (data, context) => {
+  const {user, access_token} = data
+  const playlists = [];
+  let response = { next: "first" };
+
+  while (response.next) {
+    response = await getPlaylists(
+      user,
+      access_token,
+      response.next === "first" ? null : response.next,
+      context
+    );
+
+    playlists.push(...response.items);
+  }
+
+  return playlists;
 });
 
 exports.getPlaylist = functions.https.onCall(async (data, context) => {
