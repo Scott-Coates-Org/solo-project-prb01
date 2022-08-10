@@ -4,47 +4,30 @@ firebase.functions().useEmulator("localhost", 5001);
 
 const apiURI = "https://api.spotify.com/v1";
 
-async function getAccessToken(code, state, redirectURI) {
-  const _getAccessToken = firebase.functions().httpsCallable("getAccessToken");
-  const { data } = await _getAccessToken({ code, state, redirectURI });
+async function spotifyAPICall(cloudFunction, payload) {
+  const _functionCall = firebase.functions().httpsCallable(cloudFunction);
+  const { data } = await _functionCall(payload);
   return data;
+}
+
+async function getAccessToken(code, state, redirectURI) {
+  return spotifyAPICall("getAccessToken", { code, state, redirectURI });
 }
 
 async function getRefreshedAccessToken(refreshToken, redirectURI) {
-  const _getRefreshedAccessToken = firebase
-    .functions()
-    .httpsCallable("getRefreshedAccessToken");
-  const { data } = await _getRefreshedAccessToken({ refreshToken, redirectURI });
-  return data;
+  return spotifyAPICall("getRefreshedAccessToken", { refreshToken, redirectURI });
 }
 
 async function getMe(access_token) {
-  const _getMe = firebase.functions().httpsCallable("getMe");
-  const { data } = await _getMe({ access_token });
-  return data;
+  return spotifyAPICall("getMe", { access_token });
 }
 
 async function getPlaylists(user, access_token, uri = null) {
-  const _getPlaylists = firebase.functions().httpsCallable("getPlaylists");
-  const { data } = await _getPlaylists({ user, access_token, uri });
-  return data;
+  return spotifyAPICall("getPlaylists", { user, access_token, uri });
 }
 
-export async function _getPlaylists(user, access_token, uri = null) {
-  const opts = {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + access_token,
-    },
-  };
-
-  const response = await fetch(
-    uri || `${apiURI}/users/${user}/playlists?offset=0&limit=50`,
-    opts
-  );
-
-  return response;
+async function getPlaylist(playlist_id, access_token) {
+  return spotifyAPICall("getPlaylist", { playlist_id, access_token });
 }
 
 export async function _getPlaylist(playlist_id, access_token) {
@@ -189,4 +172,10 @@ export async function _addSongsToPlaylist(playlist_id, access_token, uris) {
   return response;
 }
 
-export const spotifyService = { getAccessToken, getRefreshedAccessToken, getMe, getPlaylists };
+export const spotifyService = {
+  getAccessToken,
+  getRefreshedAccessToken,
+  getMe,
+  getPlaylists,
+  getPlaylist,
+};
