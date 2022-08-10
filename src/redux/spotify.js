@@ -94,22 +94,16 @@ export const fetchSpotifyPlaylists = createAsyncThunk(
       thunkAPI.dispatch(appendData());
 
       const playlists = [];
-      let response = { next: "first" };
+      let data = { next: "first" };
 
-      while (response.next) {
-        response = await _getPlaylists(
+      while (data.next) {
+        data = await spotifyService.getPlaylists(
           payload.user,
           payload.access_token,
-          response.next === "first" ? null : response.next
+          data.next === "first" ? null : data.next
         );
 
-        if (response.status !== 200) {
-          const errorMsg = await response.text();
-          throw { message: errorMsg };
-        }
-
-        response = await response.json();
-        playlists.push(...response.items);
+        playlists.push(...data.items);
       }
 
       const sortedPlaylists = playlists.sort(
