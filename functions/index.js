@@ -12,7 +12,7 @@ const redirectURI = `https://spotlist.prb01.com/dashboard`;
 
 // Common error to check that user is logged in to run function
 const checkUserLoggedIn = (context) => {
-  if (!context.auth) {
+  if (!context.auth && context.resource.service !== "pubsub.googleapis.com") {
     throw new functions.https.HttpsError(
       "failed-precondition",
       "The function must be called while authenticated."
@@ -24,7 +24,7 @@ const checkUserLoggedIn = (context) => {
 const checkUserIsAdmin = async (context) => {
   const user = await _fetchUserFromDb(context.auth.uid);
 
-  if (!context.auth && !user.admin) {
+  if (!user.admin) {
     throw new functions.https.HttpsError(
       "failed-precondition",
       "This function is only available to admins."
@@ -50,7 +50,7 @@ const spotifyAPICalls = async (context, opts) => {
         throw new functions.https.HttpsError("unavailable", "No response received.");
       } else {
         // Something happened in setting up the request that triggered an Error
-        console.log("Error", error.message);
+        throw new functions.https.HttpsError(error.status, error.message);
       }
     }
   }
@@ -334,7 +334,7 @@ const retry = (maxRetries, fn, sleepTime = 5000) => {
       throw new functions.https.HttpsError("unknown", error.message);
     }
 
-    console.error("**ERROR**", error.message);
+    console.error("**ERROR**", error.message, JSON.stringify(error));
     console.log(`*******waiting ${sleepTime / 1000}s before retrying*******`);
     await sleep(sleepTime);
 
@@ -344,9 +344,7 @@ const retry = (maxRetries, fn, sleepTime = 5000) => {
 
 const _fetchAllCombinedPlaylistsFromDb = async () => {
   const snapshot = await admin.firestore().collection("combined_playlists").get();
-
   const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
   return data;
 };
 
@@ -356,129 +354,119 @@ const _fetchUserFromDb = async (uid) => {
     .collection("users")
     .where("uid", "==", uid)
     .get();
-
   const data = snapshot.docs[0] ? { ...snapshot.docs[0].data() } : null;
-
   return data;
 };
 
-const _adminRefreshAllCombinedPlaylists = async (context) => {
-  const retries = 3;
-  // fetch all combined playlists
-  const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
+const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
+  // number of times to retry API call if it fails
+  const retries = 5;
 
-  console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
+  // pull user info
+  let user = await _fetchUserFromDb(combo.uid);
 
-  // loop through combined playlists
-  for (const combo of combinedPlaylists) {
-    // pull user info
-    let user = await _fetchUserFromDb(combo.uid);
+  console.log(`REFRESHING ${combo.name} for ${user.uid}`);
 
-    console.log(`REFRESHING ${combo.name} for ${user.uid}`);
+  // refresh token
+  user = await retry(retries, () =>
+    _getRefreshedAccessToken(
+      {
+        refreshToken: user.refresh_token,
+        redirectURI: redirectURI,
+      },
+      context
+    )
+  );
 
-    // refresh token
-    user = await retry(retries, () =>
-      _getRefreshedAccessToken(
-        {
-          refreshToken: user.refresh_token,
-          redirectURI: redirectURI,
-        },
-        context
-      )
-    );
+  //   check playlist still exists, else next
+  const playlist = await retry(retries, () =>
+    _getPlaylist(
+      {
+        playlist_id: combo.id,
+        access_token: user.access_token,
+      },
+      context
+    )
+  );
 
-    //   check playlist still exists, else next
-    const playlist = await retry(retries, () =>
-      _getPlaylist(
+  if (!playlist) return;
+
+  // get all songs in combined playlist
+  const tracks = await retry(retries, () =>
+    _getAllSongsFromPlaylist(
+      {
+        playlist_id: combo.id,
+        access_token: user.access_token,
+      },
+      context
+    )
+  );
+  const tracksURI = tracks.map((track) => ({
+    uri: track.track.uri,
+  }));
+
+  // remove all songs in combined playlist
+  console.log(`REMOVING ${tracksURI.length} tracks in ${combo.name}`);
+  while (tracksURI.length > 0) {
+    const deleteResponse = await retry(retries, () =>
+      _deleteSongsFromPlaylist(
         {
           playlist_id: combo.id,
           access_token: user.access_token,
+          tracks: {
+            tracks: tracksURI.slice(0, 100),
+          },
         },
         context
       )
     );
 
-    if (!playlist) continue;
+    // only remove tracks if delete was successful
+    tracksURI.splice(0, 100);
+  }
 
-    // get all songs in combined playlist
+  // loop through playlists
+  const tracksToAdd = [];
+  for (const playlist of combo.playlists) {
+    // get all songs from playlist, add to array
     const tracks = await retry(retries, () =>
       _getAllSongsFromPlaylist(
         {
-          playlist_id: combo.id,
+          playlist_id: playlist.id,
           access_token: user.access_token,
         },
         context
       )
     );
-    const tracksURI = tracks.map((track) => ({
-      uri: track.track.uri,
-    }));
 
-    // remove all songs in combined playlist
-    console.log(`REMOVING ${tracksURI.length} tracks in ${combo.name}`);
-    while (tracksURI.length > 0) {
-      const deleteResponse = await retry(retries, () =>
-        _deleteSongsFromPlaylist(
-          {
-            playlist_id: combo.id,
-            access_token: user.access_token,
-            tracks: {
-              tracks: tracksURI.slice(0, 100),
-            },
-          },
-          context
-        )
-      );
+    const tracksNotLocal = tracks
+      .filter((track) => !track.track.is_local)
+      .map((track) => track.track.uri);
+    tracksToAdd.push(...tracksNotLocal);
 
-      // only remove tracks if delete was successful
-      tracksURI.splice(0, 100);
-    }
-
-    // loop through playlists
-    const tracksToAdd = [];
-    for (const playlist of combo.playlists) {
-      // get all songs from playlist, add to array
-      const tracks = await retry(retries, () =>
-        _getAllSongsFromPlaylist(
-          {
-            playlist_id: playlist.id,
-            access_token: user.access_token,
-          },
-          context
-        )
-      );
-
-      const tracksNotLocal = tracks
-        .filter((track) => !track.track.is_local)
-        .map((track) => track.track.uri);
-      tracksToAdd.push(...tracksNotLocal);
-
-      console.log(`BUFFERING ${tracksNotLocal.length} from ${playlist.name}`);
-    }
-
-    // remove duplicates?
-
-    // add all songs to combined playlist
-    console.log(`ADDING ${tracksToAdd.length} tracks to ${combo.name}`);
-    while (tracksToAdd.length > 0) {
-      const addResponse = await retry(retries, () =>
-        _addSongsToPlaylist(
-          {
-            playlist_id: combo.id,
-            access_token: user.access_token,
-            uris: tracksToAdd.slice(0, 100),
-          },
-          context
-        )
-      );
-
-      // only remove from tracksToAdd if add was successful
-      tracksToAdd.splice(0, 100);
-    }
-    console.log(`DONE combining for ${combo.name}`);
+    console.log(`BUFFERING ${tracksNotLocal.length} from ${playlist.name}`);
   }
 
-  console.log(`COMPLETED REFRESH FOR ${combinedPlaylists.length} combos`);
+  // remove duplicates?
+
+  // add all songs to combined playlist
+  console.log(`ADDING ${tracksToAdd.length} tracks to ${combo.name}`);
+  while (tracksToAdd.length > 0) {
+    const addResponse = await retry(retries, () =>
+      _addSongsToPlaylist(
+        {
+          playlist_id: combo.id,
+          access_token: user.access_token,
+          uris: tracksToAdd.slice(0, 100),
+        },
+        context
+      )
+    );
+
+    // only remove from tracksToAdd if add was successful
+    tracksToAdd.splice(0, 100);
+  }
+  console.log(`DONE combining for ${combo.name}`);
   console.log(`**********************************************************`);
 
   return true;
@@ -488,17 +476,35 @@ exports.adminRefreshAllCombinedPlaylists = functions
   .runWith({ timeoutSeconds: 540 })
   .https.onCall(async (data, context) => {
     if (await checkUserIsAdmin(context)) {
-      retry(3, () => _adminRefreshAllCombinedPlaylists(context), 30000);
+      // fetch all combined playlists
+      const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
+
+      console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
+      for (const combo of combinedPlaylists) {
+        retry(3, () => _adminRefreshAllCombinedPlaylists(context, combo), 10000);
+        await sleep(250);
+      }
+
       return "Admin synch is running";
     }
   });
 
-exports.scheduledAdminRefreshAllCombinedPlaylists = functions.pubsub
-  .schedule("every 5 minutes")
-  .onRun((context) => {
-    console.log("This will be run every 5 minutes!");
-    _adminRefreshAllCombinedPlaylists(context);
-    return null;
+exports.scheduledAdminRefreshAllCombinedPlaylists = functions
+  .runWith({ timeoutSeconds: 540 })
+  .pubsub.schedule("every 6 hours")
+  .onRun(async (context) => {
+    console.log("*** Scheduled run of Admin Refresh all ***");
+
+    // fetch all combined playlists
+    const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
+
+    console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
+    for (const combo of combinedPlaylists) {
+      retry(3, () => _adminRefreshAllCombinedPlaylists(context, combo), 10000);
+      await sleep(250);
+    }
+
+    return "Scheduled synch is running";
   });
 
 //END   -- UTILS --
