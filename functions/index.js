@@ -327,7 +327,7 @@ const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-const retry = (maxRetries, fn, sleepTime = 5000) => {
+const retry = (maxRetries, fn, sleepTime = 1500, name = "") => {
   return fn().catch(async (error) => {
     if (maxRetries <= 0) {
       console.log(error.message);
@@ -336,6 +336,8 @@ const retry = (maxRetries, fn, sleepTime = 5000) => {
 
     console.error("**ERROR**", error.message, JSON.stringify(error));
     console.log(`*******waiting ${sleepTime / 1000}s before retrying*******`);
+    if (name !== "") console.log(`TRIES LEFT: ${maxRetries} for ${name}`);
+
     await sleep(sleepTime);
 
     return retry(maxRetries - 1, fn, sleepTime);
@@ -379,7 +381,7 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
   );
 
   //   check playlist still exists, else next
-  const playlist = await retry(retries, () =>
+  const playlist = await retry(retries, playlistAPI = () =>
     _getPlaylist(
       {
         playlist_id: combo.id,
@@ -469,7 +471,7 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
   console.log(`DONE combining for ${combo.name}`);
   console.log(`**********************************************************`);
 
-  return true;
+  return null;
 };
 
 exports.adminRefreshAllCombinedPlaylists = functions
@@ -481,8 +483,12 @@ exports.adminRefreshAllCombinedPlaylists = functions
 
       console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
       for (const combo of combinedPlaylists) {
-        retry(3, () => _adminRefreshAllCombinedPlaylists(context, combo), 10000);
-        await sleep(250);
+        retry(
+          3,
+          () => _adminRefreshAllCombinedPlaylists(context, combo),
+          3000,
+          combo.name
+        );
       }
 
       return "Admin synch is running";
@@ -500,8 +506,12 @@ exports.scheduledAdminRefreshAllCombinedPlaylists = functions
 
     console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
     for (const combo of combinedPlaylists) {
-      retry(3, () => _adminRefreshAllCombinedPlaylists(context, combo), 10000);
-      await sleep(250);
+      retry(
+        3,
+        () => _adminRefreshAllCombinedPlaylists(context, combo),
+        3000,
+        combo.name
+      );
     }
 
     return "Scheduled synch is running";
