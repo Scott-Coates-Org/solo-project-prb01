@@ -1,6 +1,6 @@
 import firebase from "firebase/app";
 require("firebase/functions");
-firebase.functions().useEmulator("localhost", 5001);
+// firebase.functions().useEmulator("localhost", 5001);
 
 async function cloudAPICall(cloudFunction, payload) {
   const _functionCall = firebase.functions().httpsCallable(cloudFunction);
