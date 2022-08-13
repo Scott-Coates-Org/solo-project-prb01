@@ -39,7 +39,7 @@ const checkUserIsAdmin = async (context) => {
 const spotifyAPICalls = async (context, opts) => {
   if (checkUserLoggedIn(context)) {
     try {
-      const response = await axios(opts);
+      const response = await axios({ ...opts, timeout: 10000 });
       return response.data;
     } catch (error) {
       if (error.response) {
@@ -54,6 +54,8 @@ const spotifyAPICalls = async (context, opts) => {
       }
     }
   }
+
+  return null;
 };
 
 // Get Spotify access token
@@ -366,10 +368,12 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
 
   // pull user info
   let user = await _fetchUserFromDb(combo.uid);
+  const uid = user.uid;
 
-  console.log(`REFRESHING ${combo.name} for ${user.uid}`);
+  console.log(`SYNCHING ${combo.name} for ${uid}`);
 
   // refresh token
+  console.log(`START REFRESHING ACCESS TOKEN for ${uid}`);
   user = await retry(retries, () =>
     _getRefreshedAccessToken(
       {
@@ -379,21 +383,27 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
       context
     )
   );
+  console.log(`END REFRESHING ACCESS TOKEN (${uid})`);
 
   //   check playlist still exists, else next
-  const playlist = await retry(retries, playlistAPI = () =>
-    _getPlaylist(
-      {
-        playlist_id: combo.id,
-        access_token: user.access_token,
-      },
-      context
-    )
+  console.log(`START CHECKING PLAYLIST EXISTS (${uid}, ${combo.id})`);
+  const playlist = await retry(
+    retries,
+    (playlistAPI = () =>
+      _getPlaylist(
+        {
+          playlist_id: combo.id,
+          access_token: user.access_token,
+        },
+        context
+      ))
   );
+  console.log(`END CHECKING PLAYLIST EXISTS (${uid}, ${combo.id}, ${!!playlist})`);
 
   if (!playlist) return;
 
   // get all songs in combined playlist
+  console.log(`START FETCH ALL SONGS FROM COMBO (${uid}, ${combo.id})`);
   const tracks = await retry(retries, () =>
     _getAllSongsFromPlaylist(
       {
@@ -406,9 +416,12 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
   const tracksURI = tracks.map((track) => ({
     uri: track.track.uri,
   }));
+  console.log(`END FETCH ALL SONGS FROM COMBO (${uid}, ${combo.id})`);
 
   // remove all songs in combined playlist
-  console.log(`REMOVING ${tracksURI.length} tracks in ${combo.name}`);
+  console.log(
+    `START REMOVING ${tracksURI.length} tracks in ${combo.name} (${uid}, ${combo.id})`
+  );
   while (tracksURI.length > 0) {
     const deleteResponse = await retry(retries, () =>
       _deleteSongsFromPlaylist(
@@ -426,8 +439,12 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
     // only remove tracks if delete was successful
     tracksURI.splice(0, 100);
   }
+  console.log(`END REMOVING tracks in ${combo.name} (${uid}, ${combo.id})`);
 
   // loop through playlists
+  console.log(
+    `START FETCH SONGS PLAYLISTS (${uid}, ${combo.id}, ${combo.playlists.length})`
+  );
   const tracksToAdd = [];
   for (const playlist of combo.playlists) {
     // get all songs from playlist, add to array
@@ -448,11 +465,16 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
 
     console.log(`BUFFERING ${tracksNotLocal.length} from ${playlist.name}`);
   }
+  console.log(
+    `END FETCH SONGS PLAYLISTS (${uid}, ${combo.id}, ${combo.playlists.length})`
+  );
 
   // remove duplicates?
 
   // add all songs to combined playlist
-  console.log(`ADDING ${tracksToAdd.length} tracks to ${combo.name}`);
+  console.log(
+    `START ADDING ${tracksToAdd.length} tracks to ${combo.name} (${uid}, ${combo.id})`
+  );
   while (tracksToAdd.length > 0) {
     const addResponse = await retry(retries, () =>
       _addSongsToPlaylist(
@@ -468,6 +490,7 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
     // only remove from tracksToAdd if add was successful
     tracksToAdd.splice(0, 100);
   }
+  console.log(`END ADDING tracks to ${combo.name} (${uid}, ${combo.id})`);
   console.log(`DONE combining for ${combo.name}`);
   console.log(`**********************************************************`);
 
@@ -475,28 +498,34 @@ const _adminRefreshAllCombinedPlaylists = async (context, combo) => {
 };
 
 exports.adminRefreshAllCombinedPlaylists = functions
-  .runWith({ timeoutSeconds: 540 })
+  .runWith({ timeoutSeconds: 540, memory: "2GB" })
   .https.onCall(async (data, context) => {
     if (await checkUserIsAdmin(context)) {
       // fetch all combined playlists
       const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
 
       console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
-      for (const combo of combinedPlaylists) {
-        retry(
-          3,
-          () => _adminRefreshAllCombinedPlaylists(context, combo),
-          3000,
-          combo.name
-        );
-      }
+      return new Promise(async (resolve, reject) => {
+        try {
+          for (const combo of combinedPlaylists) {
+            await retry(
+              3,
+              () => _adminRefreshAllCombinedPlaylists(context, combo),
+              3000,
+              combo.name
+            );
+          }
 
-      return "Admin synch is running";
+          return resolve("Synch Finished");
+        } catch (error) {
+          return reject(error.message);
+        }
+      });
     }
   });
 
 exports.scheduledAdminRefreshAllCombinedPlaylists = functions
-  .runWith({ timeoutSeconds: 540 })
+  .runWith({ timeoutSeconds: 540, memory: "2GB" })
   .pubsub.schedule("every 6 hours")
   .onRun(async (context) => {
     console.log("*** Scheduled run of Admin Refresh all ***");
@@ -505,16 +534,22 @@ exports.scheduledAdminRefreshAllCombinedPlaylists = functions
     const combinedPlaylists = await _fetchAllCombinedPlaylistsFromDb();
 
     console.log(`BEGIN REFRESH FOR ${combinedPlaylists.length} combos`);
-    for (const combo of combinedPlaylists) {
-      retry(
-        3,
-        () => _adminRefreshAllCombinedPlaylists(context, combo),
-        3000,
-        combo.name
-      );
-    }
+    return new Promise(async (resolve, reject) => {
+      try {
+        for (const combo of combinedPlaylists) {
+          await retry(
+            3,
+            () => _adminRefreshAllCombinedPlaylists(context, combo),
+            3000,
+            combo.name
+          );
+        }
 
-    return "Scheduled synch is running";
+        return resolve("Synch Finished");
+      } catch (error) {
+        return reject(error.message);
+      }
+    });
   });
 
 //END   -- UTILS --
